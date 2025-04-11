@@ -1,7 +1,7 @@
 import subprocess, os
 
 
-subprocess.run(["git", "clone", "https://github.com/kedsouza/AppServiceLinuxQuickRepo.git"])
+subprocess.run(["wget", "https://raw.githubusercontent.com/kedsouza/AppServiceLinuxQuickRepo/refs/heads/main/run.sh"])
 
 Repo_name = "AppServiceLinuxQuickRepo"
 
