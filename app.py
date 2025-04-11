@@ -1,11 +1,11 @@
-import subprocess, os
+import subprocess, os, json, random
 
 # Download and extract the necessary modules to run the script
 subprocess.run(["wget", "https://raw.githubusercontent.com/kedsouza/AppServiceLinuxQuickRepo/refs/heads/main/run.sh"])
 subprocess.run(["wget", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
 subprocess.run(["unzip", "modules.zip"])
+subprocess.run(["rm", "modules.zip"])
 
-Repo_name = "AppServiceLinuxQuickRepo"
 
 bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
@@ -31,6 +31,19 @@ if int(x) == 1:
     f.write('\n')
     f.write(bicep_code['appserviceblessedimage'])
     f.close()
+
+    #subprocess.run(["bash", "run.sh"])
+    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
+    name = json.loads(deploy_name.stdout)['user']['name']
+    user_name = name.split('@')[0]
+    print(user_name)
+    d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
+    #az group create --name $name --location eastus
+    subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
+    #az deployment group create --resource-group $name --template-file main.bicep
+    subprocess.run(["az", "deployment", "group", "create", "--resource-group", d_name, "--template-file", "main.bicep"])
+
+
 else:
     print ('Not implemented yet:')
 # print('Add what feature you want to add')
@@ -41,12 +54,5 @@ else:
 # print('Azure Front Door')
 # print('Azure KeyVault')
 
-subprocess.run(["bash", "run.sh"])
-
-#az group create --name $name --location eastus
-#subprocess.run(["az", "group", "create", "--name", "test-23", "--location", "eastus"])
-
-#az deployment group create --resource-group $name --template-file main.bicep
-#subprocess.run(["az", "deployment", "group", "create", "--resource-group", "test-23", "--template-file", "AzureServiceLinuxQuickRepo/main.bicep"])
 
 
