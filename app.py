@@ -1,13 +1,17 @@
+import subprocess, os
+
+
+
+
+subprocess.run(["git", "clone", "https://github.com/kedsouza/AppServiceLinuxQuickRepo.git"])
+
+Repo_name = "AppServiceLinuxQuickRepo"
+
 bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
 }
     
-
-
-
-
-
 x = ''
 while x == '':
     try: 
@@ -22,7 +26,7 @@ while x == '':
 
 
 if int(x) == 1:
-    f = open ('main.bicep', 'w')
+    f = open ('AppServiceLinuxQuickRepo/main.bicep', 'w')
     f.write(bicep_code['appserviceplan'])
     f.write('\n')
     f.write(bicep_code['appserviceblessedimage'])
@@ -36,3 +40,13 @@ else:
 # print('App GateWay')
 # print('Azure Front Door')
 # print('Azure KeyVault')
+
+subprocess.run(["bash", "run.sh"])
+
+#az group create --name $name --location eastus
+#subprocess.run(["az", "group", "create", "--name", "test-23", "--location", "eastus"])
+
+#az deployment group create --resource-group $name --template-file main.bicep
+#subprocess.run(["az", "deployment", "group", "create", "--resource-group", "test-23", "--template-file", "AzureServiceLinuxQuickRepo/main.bicep"])
+
+
