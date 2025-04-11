@@ -1,7 +1,6 @@
 import subprocess, os, json, random
 
 # Download and extract the necessary modules to run the script
-subprocess.run(["wget", "https://raw.githubusercontent.com/kedsouza/AppServiceLinuxQuickRepo/refs/heads/main/run.sh"])
 subprocess.run(["wget", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
 subprocess.run(["unzip", "modules.zip"])
 subprocess.run(["rm", "modules.zip"])
@@ -51,7 +50,6 @@ else:
 # print('Private Endpoint')
 # print('Storage Mount: Blob / File ')
 # print('App GateWay')
-# print('Azure Front Door')
 # print('Azure KeyVault')
 
 
