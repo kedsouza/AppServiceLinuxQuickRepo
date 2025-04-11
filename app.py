@@ -1,8 +1,6 @@
 import subprocess, os
 
 
-
-
 subprocess.run(["git", "clone", "https://github.com/kedsouza/AppServiceLinuxQuickRepo.git"])
 
 Repo_name = "AppServiceLinuxQuickRepo"
@@ -41,7 +39,7 @@ else:
 # print('Azure Front Door')
 # print('Azure KeyVault')
 
-subprocess.run(["bash", "run.sh"])
+subprocess.run(["bash", "AppServiceLinuxQuickRepo/run.sh"])
 
 #az group create --name $name --location eastus
 #subprocess.run(["az", "group", "create", "--name", "test-23", "--location", "eastus"])
