@@ -1,7 +1,9 @@
 import subprocess, os
 
-
+# Download and extract the necessary modules to run the script
 subprocess.run(["wget", "https://raw.githubusercontent.com/kedsouza/AppServiceLinuxQuickRepo/refs/heads/main/run.sh"])
+subprocess.run(["wget", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
+subprocess.run(["unzip", "modules.zip"])
 
 Repo_name = "AppServiceLinuxQuickRepo"
 
@@ -24,7 +26,7 @@ while x == '':
 
 
 if int(x) == 1:
-    f = open ('AppServiceLinuxQuickRepo/main.bicep', 'w')
+    f = open ('main.bicep', 'w')
     f.write(bicep_code['appserviceplan'])
     f.write('\n')
     f.write(bicep_code['appserviceblessedimage'])
@@ -39,7 +41,7 @@ else:
 # print('Azure Front Door')
 # print('Azure KeyVault')
 
-subprocess.run(["bash", "AppServiceLinuxQuickRepo/run.sh"])
+subprocess.run(["bash", "run.sh"])
 
 #az group create --name $name --location eastus
 #subprocess.run(["az", "group", "create", "--name", "test-23", "--location", "eastus"])
