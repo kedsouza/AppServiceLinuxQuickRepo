@@ -1,6 +1,8 @@
-git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git
+#!/bin/bash
 
-cd AppServiceLinuxQuickRepo
+# git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git
+
+# cd AppServiceLinuxQuickRepo
 
 name=$USER-$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 5)
 
