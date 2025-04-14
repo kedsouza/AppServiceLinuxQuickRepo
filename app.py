@@ -11,7 +11,6 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-print(bcolors.WARNING + "Warning: No active frommets remain. Continue?" + bcolors.ENDC)
 
 
 # Download and extract the necessary modules to run the script
@@ -30,9 +29,9 @@ while x == '':
     try: 
         print("Choose App Service Type:")
         print()
-        print("Blessed Image: " + bcolors.WARNING + "(1)" + bcolors.ENDC)
-        print("Web App for Container Public Image: " + bcolors.WARNING + "(2)" + bcolors.ENDC)
-        print("Web App for Container Azure Container Registry Private Image: "  + bcolors.WARNING + "(3)" + bcolors.ENDC)
+        print("Blessed Image: " + bcolors.WARNING + "[1]" + bcolors.ENDC)
+        print("Web App for Container Public Image: " + bcolors.WARNING + "[2]" + bcolors.ENDC)
+        print("Web App for Container Azure Container Registry Private Image: "  + bcolors.WARNING + "[3]" + bcolors.ENDC)
         x = input("Enter 1,2, or 3: ")
         if int(x) not in ([1,2,3]):
             x = ''
@@ -50,19 +49,26 @@ if int(x) == 1:
     name = json.loads(deploy_name.stdout)['user']['name']
     user_name = name.split('@')[0]
     d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-else if (int(x) == 2):
+elif (int(x) == 2):
     print('Not implemented')
-else if (int(x) == 3):
+elif (int(x) == 3):
     print('Not implemented')
 
+done = False
+additional_services = []
 while done == False:
     print("Select additional services to add: ")
-    print('Vnet Intergration ? ')
-    print('Private Endpoint')
-    print('Storage Mount Blob')
-    print('Storage Mount File')
-    print('App GateWay')
-    print('KeyVault')
+    print('Vnet Intergration [1] ')
+    print('Private Endpoint [2]')
+    print('Storage Mount Blob [3]')
+    print('Storage Mount File [4]')
+    print('App GateWay [5]')
+    print('KeyVault [6]')
+ 
+    y = input()
+    additional_services.append(y)
+    print(additional_services)
+
 
 
 
