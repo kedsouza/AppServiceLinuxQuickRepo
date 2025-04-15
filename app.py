@@ -11,68 +11,98 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-
-
-# Download and extract the necessary modules to run the script
-subprocess.run(["wget", "-q", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
-subprocess.run(["unzip", "-q", "modules.zip"])
-subprocess.run(["rm","modules.zip"])
-
+def write_bicep(modules_list):
+    f = open ('main.bicep', 'w')
+    for module_name in modules_list: 
+        f.write(bicep_code[module_name])
+        f.write('\n')
+    f.close()
 
 bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
 }
     
-x = ''
-while x == '':
-    try: 
-        print("Choose App Service Type:")
-        print()
-        print("Blessed Image: " + bcolors.WARNING + "[1]" + bcolors.ENDC)
-        print("Web App for Container Public Image: " + bcolors.WARNING + "[2]" + bcolors.ENDC)
-        print("Web App for Container Azure Container Registry Private Image: "  + bcolors.WARNING + "[3]" + bcolors.ENDC)
-        x = input("Enter 1,2, or 3: ")
-        if int(x) not in ([1,2,3]):
-            x = ''
-            print('Incorrect value, enter: 1, 2, or 3')
-    except ValueError:
-        print('Incorrect Value, enter: 1, 2, or 3')
+appservice_types = { 1 : "Blessed Image: ", 2 : "Web App for Container Public Image: ", 3: "Web App for Container Azure Container Registry Private Image: "}
+deployment_name = 'kedsouza-appsvc-test-32'
 
-if int(x) == 1:
-    f = open ('main.bicep', 'w')
-    f.write(bicep_code['appserviceplan'])
-    f.write('\n')
-    f.write(bicep_code['appserviceblessedimage'])
-    f.close()
-    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
-    name = json.loads(deploy_name.stdout)['user']['name']
-    user_name = name.split('@')[0]
-    d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-elif (int(x) == 2):
-    print('Not implemented')
-elif (int(x) == 3):
-    print('Not implemented')
+# Download and extract the necessary modules to run the script
+subprocess.run(["wget", "-q", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
+subprocess.run(["unzip", "-q", "modules.zip"])
+subprocess.run(["rm","modules.zip"])
+
+appservice_type = ''
+while appservice_type == '':
+    try: 
+        print("Choose App Service Type:\n")
+        print(appservice_types[1] + bcolors.WARNING + "[1]" + bcolors.ENDC)
+        print(appservice_types[2] + bcolors.WARNING + "[2]" + bcolors.ENDC)
+        print(appservice_types[3] + bcolors.WARNING + "[3]" + bcolors.ENDC)
+        appservice_type = int(input("Enter 1,2, or 3: "))
+        if int(appservice_type) not in ([1,2,3]):
+            appservice_type = ''
+            print('\n' + bcolors.FAIL + 'Incorrect value, enter: 1, 2, or 3' + bcolors.ENDC)
+    except ValueError:
+        print('\n' + bcolors.FAIL + 'Incorrect value, enter: 1, 2, or 3' + bcolors.ENDC)
+
+match appservice_type:
+    case 1:
+        write_bicep(["appserviceplan", "appserviceblessedimage"])
+    case 2:
+        print ("Not implemented Yet")
+        exit()
+    case 3:
+        print ("Not implemented Yet")
+        exit()
+
+hash_additional_services = {
+    1 : ["Vnet Intergration        ", False],
+    2 : ["Private Endpoint         ", False],
+    3 : ["Storage Mount Blob       ", False],
+    4:  ["Storage Mount File Share ", False],
+    5 : ["App GateWay              ", False],
+    6 : ["KeyVault                 ", False]
+}
 
 done = False
-additional_services = []
 while done == False:
-    print("Select additional services to add: ")
-    print('Vnet Intergration [1] ')
-    print('Private Endpoint [2]')
-    print('Storage Mount Blob [3]')
-    print('Storage Mount File [4]')
-    print('App GateWay [5]')
-    print('KeyVault [6]')
+    print("\nEnter space seperated numbers of the options, if done type: " + bcolors.OKGREEN + "[Y]" + bcolors.ENDC)
+    print("Select additional services to add: \n")
+
+    print ('Service                     | Added')
+    
+    for i in range (1,7):
+        service = hash_additional_services.get(i)
+        if service[1] == False:
+            print ("{0:18}| {1}".format(service[0] + bcolors.WARNING + "[" + str(i) + "]" + bcolors.ENDC, str(service[1])))
+        else:
+            print ("{0:18}| {1}".format(service[0] + bcolors.WARNING + "[" + str(i) + "]" + bcolors.ENDC, (bcolors.OKGREEN + str(service[1]) + bcolors.ENDC + " - Re-enter number to remove")))
  
     y = input()
-    additional_services.append(y)
-    print(additional_services)
+    input_string = y.split(" ")
+    for i in input_string:
+        if i in ['1', '2', '3', '4', '5', '6']:
+            service = hash_additional_services.get(int(i))
+            if service[1] == False:
+                hash_additional_services[int(i)] = [hash_additional_services[int(i)][0], True]
+            else:
+                hash_additional_services[int(i)] = [hash_additional_services[int(i)][0], False]
+        elif i == "Y":
+            done = True
+
+#Testing 
+print (deployment_name, hash_additional_services)
 
 
 
+# Commented out for testing.
 
+# Refactor start at beginning of the program and make async.
 
+# deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
+# name = json.loads(deploy_name.stdout)['user']['name']
+# user_name = name.split('@')[0]
+# d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
 
 # #az group create --name $name --location eastus
 # subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
