@@ -66,6 +66,7 @@ def run_input_loop():
     match appservice_type:
         case 1:
             write_bicep(["appserviceplan", "appserviceblessedimage"])
+            print("Not implemented Yet")
         case 2:
             print ("Not implemented Yet")
             exit()
@@ -87,6 +88,7 @@ def run_input_loop():
             else:
                 print ("{0:18}| {1}".format(service[0] + bcolors.WARNING + "[" + str(i) + "]" + bcolors.ENDC, (bcolors.OKGREEN + str(service[1]) + bcolors.ENDC + " - Re-enter number to remove")))
     
+        print("Enter Input")
         y = input()
         input_string = y.split(" ")
         for i in input_string:
@@ -101,15 +103,33 @@ def run_input_loop():
 
     return hash_additional_services
 
+def deploy_bicep(user_name):
+    d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
+    #az group create --name $name --location eastus
+    subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
+    #az deployment group create --resource-group $name --template-file main.bicep
+    output = subprocess.run(["az", "deployment", "group", "create", "--resource-group", d_name, "--template-file", "main.bicep"], capture_output=True)
+    return output
+
 async def main():
     
     a = await asyncio.gather(
         asyncio.to_thread(get_az_account_name),
         asyncio.to_thread(download_bicep_modules),
-        asyncio.to_thread(run_input_loop)
+        asyncio.to_thread(run_input_loop),
     )
 
     print(a)
+
+    print(f"started at {time.strftime('%X')}")
+    b = await asyncio.gather(
+        asyncio.to_thread(deploy_bicep, a[0]),
+    )
+
+    print(f"finished at {time.strftime('%X')}")
+    print(b)
+
+
 
 
     
