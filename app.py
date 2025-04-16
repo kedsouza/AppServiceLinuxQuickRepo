@@ -110,7 +110,7 @@ deployment_times = {
 }
 def deploy_bicep(user_name):
     d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-    time.sleep(112))
+    time.sleep(112)
     
     #az group create --name $name --location eastus
     #subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
