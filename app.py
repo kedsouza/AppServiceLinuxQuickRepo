@@ -110,7 +110,7 @@ deployment_times = {
 }
 def deploy_bicep(user_name):
     d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-    time.sleep(5)
+    time.sleep(112))
     
     #az group create --name $name --location eastus
     #subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
@@ -154,7 +154,7 @@ async def main():
     print(f"started at {time.strftime('%X')}")
     b = await asyncio.gather(
         asyncio.to_thread(deploy_bicep, a[0]),
-        asyncio.to_thread(countdown_timer, 5),
+        asyncio.to_thread(countdown_timer,112),
     )
 
     print(f"finished at {time.strftime('%X')}")
