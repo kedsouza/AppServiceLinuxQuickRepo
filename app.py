@@ -113,7 +113,7 @@ def main():
     
     print("Getting account information...")
     account_data = get_az_account_data()
-    tenantDefaultDomain, subscription, user_name = account_data['tenantDefaultDomain'], account_data['id'], account_data['user']['name'].split('@')[0]
+    subscription, user_name = account_data['id'], account_data['user']['name'].split('@')[0]
     print("User: {0}".format(user_name))
     print("Subscription: {0}".format(subscription))
 
@@ -124,7 +124,7 @@ def main():
     deploy_bicep(deploy_name)
 
     print ("Your depeployment seems complete here is the resource group link")
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@{0}/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(tenantDefaultDomain, subscription, deploy_name) + bcolors.ENDC)
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(subscription, deploy_name) + bcolors.ENDC)
 
 
 main()    
