@@ -124,7 +124,7 @@ def main():
     deploy_bicep(deploy_name)
 
     print ("Your depeployment seems complete here is the resource group link")
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(subscription, deploy_name) + bcolors.ENDC)
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription, deploy_name) + bcolors.ENDC)
 
 
 main()    
