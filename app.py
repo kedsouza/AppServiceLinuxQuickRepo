@@ -1,19 +1,24 @@
 import subprocess, os, json, random, asyncio, time
 
 bicep_code = {
-        "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
-        "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
-    }
-        
-appservice_types = { 1 : "Blessed Image: ", 2 : "Web App for Container Public Image: ", 3: "Web App for Container Azure Container Registry Private Image: "}
+    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
+    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
+}
+
+appservice_types = { 
+    1 : "Blessed Image: ",
+    2 : "Web App for Container Public Image: ",
+    3: "Web App for Container Azure Container Registry Private Image: "
+}
+
 hash_additional_services = {
-        1 : ["Vnet Intergration        ", False],
-        2 : ["Private Endpoint         ", False],
-        3 : ["Storage Mount Blob       ", False],
-        4:  ["Storage Mount File Share ", False],
-        5 : ["App GateWay              ", False],
-        6 : ["KeyVault                 ", False]
-    }
+    1 : ["Vnet Intergration        ", False],
+    2 : ["Private Endpoint         ", False],
+    3 : ["Storage Mount Blob       ", False],
+    4:  ["Storage Mount File Share ", False],
+    5 : ["App GateWay              ", False],
+    6 : ["KeyVault                 ", False]
+}
 
 class bcolors:
     HEADER = '\033[95m'
@@ -26,8 +31,6 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-account_name = 'placeholder'
-
 def write_bicep(modules_list):
     f = open ('main.bicep', 'w')
     for module_name in modules_list: 
@@ -36,14 +39,8 @@ def write_bicep(modules_list):
     f.close()
 
 def get_az_account_data():
-    #return "kedsouza"
-    #Bug hanging output
     deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
     return json.loads(deploy_name.stdout)
-    #name = json.loads(deploy_name.stdout)['user']['name']
-    #user_name = name.split('@')[0]
-    #return user_name
-    
 
 def download_bicep_modules():
     # Download and extract the necessary modules to run the script
@@ -105,65 +102,29 @@ def run_input_loop():
 
     return hash_additional_services
 
-
-deployment_times = {
-    "blessed image" : "14:54:58 -14:56:10 - 1 minute 52 seconds"
-}
-def deploy_bicep(user_name):
-    d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-    time.sleep(5)
+def deploy_bicep(deployment_name):
+    # az group create --name $name --location eastus
+    subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"])
     
-    #az group create --name $name --location eastus
-    #subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
-    
-    # Output {""""id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9",
-    #"location": "eastus",
-    #"managedBy": null,
-    #"name": "kedsouza-appserviceblessedimage-9",
-    #"properties": {
-    #  "provisioningState": "Succeeded"
-    #},
-    #"tags": null,
-    #"type": "Microsoft.Resources/resourceGroups"
-    #}
-  
-    # Link to create: https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/overview
-
     #az deployment group create --resource-group $name --template-file main.bicep
-    #output = subprocess.run(["az", "deployment", "group", "create", "--resource-group", d_name, "--template-file", "main.bicep"], capture_output=True)
-    # Sample OutPut
-    return """[CompletedProcess(args=['az', 'deployment', 'group', 'create', '--resource-group', 'kedsouza-appserviceblessedimage-9', '--template-file', 'main.bicep'], returncode=0, stdout=b'{\n  "id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/providers/Microsoft.Resources/deployments/main",\n  "location": null,\n  "name": "main",\n  "properties": {\n    "correlationId": "92f8249f-5165-4df5-a885-1568deba70ea",\n    "debugSetting": null,\n    "dependencies": [\n      {\n        "dependsOn": [\n          {\n            "id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/providers/Microsoft.Resources/deployments/appserviceplan-jthnm6xe6hucq",\n            "resourceGroup": "kedsouza-appserviceblessedimage-9",\n            "resourceName": "appserviceplan-jthnm6xe6hucq",\n            "resourceType": "Microsoft.Resources/deployments"\n          }\n        ],\n        "id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/providers/Microsoft.Resources/deployments/appservice-qbyz4gkcq5gg2",\n        "resourceGroup": "kedsouza-appserviceblessedimage-9",\n        "resourceName": "appservice-qbyz4gkcq5gg2",\n        "resourceType": "Microsoft.Resources/deployments"\n      }\n    ],\n    "duration": "PT43.828575S",\n    "error": null,\n    "mode": "Incremental",\n    "onErrorDeployment": null,\n    "outputResources": [\n      {\n        "id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/providers/Microsoft.Web/serverfarms/asp-qbvafpszw6svy",\n        "resourceGroup": "kedsouza-appserviceblessedimage-9"\n      },\n      {\n        "id": "/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/providers/Microsoft.Web/sites/asp-qbvafpszw6svy",\n        "resourceGroup": "kedsouza-appserviceblessedimage-9"\n      }\n    ],\n    "outputs": null,\n    "parameters": null,\n    "parametersLink": null,\n    "providers": [\n      {\n        "id": null,\n        "namespace": "Microsoft.Resources",\n        "providerAuthorizationConsentState": null,\n        "registrationPolicy": null,\n        "registrationState": null,\n        "resourceTypes": [\n          {\n            "aliases": null,\n            "apiProfiles": null,\n            "apiVersions": null,\n            "capabilities": null,\n            "defaultApiVersion": null,\n            "locationMappings": null,\n            "locations": [\n              null\n            ],\n            "properties": null,\n            "resourceType": "deployments",\n            "zoneMappings": null\n          }\n        ]\n      }\n    ],\n    "provisioningState": "Succeeded",\n    "templateHash": "9091923867377092764",\n    "templateLink": null,\n    "timestamp": "2025-04-16T14:55:52.422158+00:00",\n    "validatedResources": null\n  },\n  "resourceGroup": "kedsouza-appserviceblessedimage-9",\n  "tags": null,\n  "type": "Microsoft.Resources/deployments"\n}\n', stderr=b'')]"""
-
-def countdown_timer(wait_time):
-    count  = 0
-    for i in range (0, wait_time):
-        print("Estimated deployment time:", wait_time - i)
-        time.sleep(1)
-    return "done"
-
+    output = subprocess.run(["az", "deployment", "group", "create", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True)
 
 def main():
     
+    print("Getting account information...")
     account_data = get_az_account_data()
-
     tenantDefaultDomain, subscription, user_name = account_data['tenantDefaultDomain'], account_data['id'], account_data['user']['name'].split('@')[0]
-    print(account_data)
-    print(user_name)
+    print("User: {0}".format(user_name))
+    print("Subscription: {0}".format(subscription))
 
-
-  
     download_bicep_modules()
     run_input_loop()
 
+    deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
+    deploy_bicep(deploy_name)
 
-    deploy_bicep(user_name)
-    
-
-
-    print ("Your depeployment seems complete here is the resource group link":)
-    d_name = user_name + '-appserviceblessedimage-' + str(9)
-    print(d_name, user_name)
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@{0}/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(tenantDefaultDomain, subscription, d_name) + bcolors.ENDC)
+    print ("Your depeployment seems complete here is the resource group link")
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@{0}/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(tenantDefaultDomain, subscription, deploy_name) + bcolors.ENDC)
 
 
 main()    
