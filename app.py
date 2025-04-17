@@ -35,13 +35,14 @@ def write_bicep(modules_list):
         f.write('\n')
     f.close()
 
-def get_az_account_name():
-    return "kedsouza"
+def get_az_account_data():
+    #return "kedsouza"
     #Bug hanging output
     deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
-    name = json.loads(deploy_name.stdout)['user']['name']
-    user_name = name.split('@')[0]
-    return user_name
+    return json.loads(deploy_name.stdout)
+    #name = json.loads(deploy_name.stdout)['user']['name']
+    #user_name = name.split('@')[0]
+    #return user_name
     
 
 def download_bicep_modules():
@@ -110,7 +111,7 @@ deployment_times = {
 }
 def deploy_bicep(user_name):
     d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-    time.sleep(112)
+    time.sleep(5)
     
     #az group create --name $name --location eastus
     #subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
@@ -143,8 +144,15 @@ def countdown_timer(wait_time):
 
 async def main():
     
+    account_data = get_az_account_data()
+
+    tenantDefaultDomain, subscription, user_name = account_data['tenantDefaultDomain'], account_data['id'], account_data['user']['name'].split('@')[0]
+    print(account_data)
+    print(user_name)
+
+
     a = await asyncio.gather(
-        asyncio.to_thread(get_az_account_name),
+#        asyncio.to_thread(get_az_account_data),
         asyncio.to_thread(download_bicep_modules),
         asyncio.to_thread(run_input_loop),
     )
@@ -153,16 +161,18 @@ async def main():
 
     print(f"started at {time.strftime('%X')}")
     b = await asyncio.gather(
-        asyncio.to_thread(deploy_bicep, a[0]),
-        asyncio.to_thread(countdown_timer,112),
+        asyncio.to_thread(deploy_bicep, user_name),
+        asyncio.to_thread(countdown_timer,5),
     )
 
     print(f"finished at {time.strftime('%X')}")
-    print(b)
+    #print(b)
 
     print ("Your depeployment seems complete: here is the resource group link")
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/overview" + bcolors.ENDC)
-
+    d_name = user_name + '-appserviceblessedimage-' + str(9)
+    print(d_name, user_name)
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@{0}/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(tenantDefaultDomain, subscription, d_name) + bcolors.ENDC)
+    print("https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/overview")
 
 
     
