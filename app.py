@@ -142,7 +142,7 @@ def countdown_timer(wait_time):
     return "done"
 
 
-async def main():
+def main():
     
     account_data = get_az_account_data()
 
@@ -151,33 +151,22 @@ async def main():
     print(user_name)
 
 
-    a = await asyncio.gather(
-#        asyncio.to_thread(get_az_account_data),
-        asyncio.to_thread(download_bicep_modules),
-        asyncio.to_thread(run_input_loop),
-    )
+  
+    download_bicep_modules()
+    run_input_loop()
 
-    print(a)
 
-    print(f"started at {time.strftime('%X')}")
-    b = await asyncio.gather(
-        asyncio.to_thread(deploy_bicep, user_name),
-        asyncio.to_thread(countdown_timer,5),
-    )
+    deploy_bicep(user_name)
+    
 
-    print(f"finished at {time.strftime('%X')}")
-    #print(b)
 
-    print ("Your depeployment seems complete: here is the resource group link")
+    print ("Your depeployment seems complete here is the resource group link":)
     d_name = user_name + '-appserviceblessedimage-' + str(9)
     print(d_name, user_name)
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@{0}/resource/subscriptions/{1}/resourceGroups/{2}/overview".format(tenantDefaultDomain, subscription, d_name) + bcolors.ENDC)
-    print("https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/bf7728b1-4728-478d-96bc-db17b8ebc9ff/resourceGroups/kedsouza-appserviceblessedimage-9/overview")
 
 
-    
-
-asyncio.run(main())
+main()    
 
 # Commented out for testing.
 
