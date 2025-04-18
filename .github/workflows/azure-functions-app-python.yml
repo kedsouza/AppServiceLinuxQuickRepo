@@ -1,0 +1,19 @@
+name: Deploy Python project to Azure Function App
+
+on:
+  push:
+    branches: ["main"]
+    
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+    - name: 'Zip up modules'
+      uses: actions/checkout@v4
+
+    - name: 'Resolve Project Dependencies Using Pip'
+      shell: bash
+      run: |
+        echo "Hello World !"
+
