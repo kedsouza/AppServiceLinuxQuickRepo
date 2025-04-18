@@ -107,7 +107,7 @@ def deploy_bicep(deployment_name):
     subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"])
     
     #az deployment group create --resource-group $name --template-file main.bicep
-    subprocess.run(["az", "deployment", "group", "create", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True)
+    subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True)
 
 def main():
     
