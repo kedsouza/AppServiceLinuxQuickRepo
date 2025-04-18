@@ -1,3 +1,3 @@
 # AppServiceQuickRepo
 
-`wget https://raw.githubusercontent.com/kedsouza/AppServiceLinuxQuickRepo/refs/heads/main/app.py && python app.py`
+`git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py`
