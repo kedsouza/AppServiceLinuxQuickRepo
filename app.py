@@ -39,8 +39,9 @@ def write_bicep(modules_list):
     f.close()
 
 def get_az_account_data():
-    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
+    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True, shell=True)
     return json.loads(deploy_name.stdout)
+
 
 def download_bicep_modules():
     # Download and extract the necessary modules to run the script
@@ -104,23 +105,21 @@ def run_input_loop():
 
 def deploy_bicep(deployment_name):
     # az group create --name $name --location eastus
-    subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"])
+    subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"], shell=True)
     
     #az deployment group create --resource-group $name --template-file main.bicep
-    subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True)
+    subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
 def main():
-    
-    print("Getting account information...")
     account_data = get_az_account_data()
     subscription, user_name = account_data['id'], account_data['user']['name'].split('@')[0]
     print("User: {0}".format(user_name))
     print("Subscription: {0}".format(subscription))
 
-    download_bicep_modules()
+    #download_bicep_modules()
     run_input_loop()
 
-    deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
+    deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
     deploy_bicep(deploy_name)
 
     print ("Your depeployment seems complete here is the resource group link")
