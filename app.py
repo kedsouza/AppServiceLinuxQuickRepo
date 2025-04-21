@@ -1,4 +1,4 @@
-import subprocess, os, json, random, asyncio, time
+import subprocess, sys, io, os, json, random, asyncio, time
 
 bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
@@ -30,6 +30,15 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+def stream_output(command):
+    filename = "stream.log"
+    with io.open(filename, "w") as writer, io.open(filename, "r") as reader:
+        process = subprocess.Popen(command, shell= True, stdout=writer)
+        while process.poll() is None:
+            sys.stdout.write(reader.read())
+        # Read the remaining
+        sys.stdout.write(reader.read())
 
 def write_bicep(modules_list):
     f = open ('main.bicep', 'w')
@@ -105,10 +114,12 @@ def run_input_loop():
 
 def deploy_bicep(deployment_name):
     # az group create --name $name --location eastus
-    subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"], shell=True)
+    #subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"], shell=True)
+    stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
     
-    #az deployment group create --resource-group $name --template-file main.bicep
-    subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
+    #az deployment group create --verbose --resource-group $name --template-file main.bicep
+    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"])
+    #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
 def main():
     account_data = get_az_account_data()
@@ -120,6 +131,7 @@ def main():
     run_input_loop()
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
+    print("Your deployment will approximately take 78 seconds")
     deploy_bicep(deploy_name)
 
     print ("Your depeployment seems complete here is the resource group link")
