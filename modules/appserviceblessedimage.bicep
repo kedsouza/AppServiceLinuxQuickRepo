@@ -11,13 +11,7 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
   properties : {
     serverFarmId: appServicePlanName
     siteConfig: {
-      linuxFxVersion: 'node|16-lts'
-      appSettings: [
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
-        }
-      ]
+      linuxFxVersion: 'PHP|8.4'
     }
   }
 }
