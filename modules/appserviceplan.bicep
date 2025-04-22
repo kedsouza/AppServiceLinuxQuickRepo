@@ -1,11 +1,13 @@
 var location = resourceGroup().location
 
+param name string
+
 resource appserviceplan 'Microsoft.Web/serverfarms@2024-04-01' = {
-  name: 'asp-${uniqueString(resourceGroup().id)}'
+  name: name
   location: location
   kind: 'linux'
   sku: {
-    name: 'B2'
+    name: 'B3'
   }
   properties: {
     reserved: true

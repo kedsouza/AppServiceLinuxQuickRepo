@@ -1,9 +1,12 @@
-import subprocess, sys, io, os, json, random, asyncio, time
+import subprocess, sys, io, os, json, random, asyncio, time, uuid
 
-bicep_code = {
-    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
+bicep_code = { 
+    "param_name" : "param uid string",
+    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {name: uid }}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewebforcontinaerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
+    "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
+    "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
+    "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}"
 }
 
 appservice_types = { 
@@ -43,7 +46,7 @@ def stream_output(command):
         sys.stdout.write(reader.read())
 
 def write_bicep(modules_list):
-    f = open ('main.bicep', 'w')
+    f = open ('main.bicep', 'a')
     for module_name in modules_list: 
         f.write(bicep_code[module_name])
         f.write('\n')
@@ -76,14 +79,15 @@ def run_input_loop():
         except ValueError:
             print('\n' + bcolors.FAIL + 'Incorrect value, enter: 1, 2, or 3' + bcolors.ENDC)
 
+    write_bicep(["param_name"])
+
     match appservice_type:
         case 1:
             write_bicep(["appserviceplan", "appserviceblessedimage"])
         case 2:
-            write_bicep(["appserviceplan", "appservicewebforcontinaerpublic"])
+            write_bicep(["appserviceplan", "appservicewebforcontainerpublic"])
         case 3:
-            print ("Not implemented Yet")
-            exit()
+            write_bicep(["appserviceplan", "acr", "appservicewebforcontainerprivate"])
 
     done = False
     while done == False:
@@ -111,29 +115,43 @@ def run_input_loop():
             elif i == "Y":
                 done = True
 
-    return hash_additional_services
+    return [appservice_type, hash_additional_services]
 
-def deploy_bicep(deployment_name):
+def deploy_bicep(deployment_name, name):
+    print(name)
     # az group create --name $name --location eastus
     #subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"], shell=True)
     stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
     
-    #az deployment group create --verbose --resource-group $name --template-file main.bicep
-    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"])
+    #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters name="uid"
+    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("uid=" + name ) ])
     #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
+
+
 def main():
+    name = str(uuid.uuid4())[0:6]
+    
     account_data = get_az_account_data()
     subscription, user_name = account_data['id'], account_data['user']['name'].split('@')[0]
     print("User: {0}".format(user_name))
     print("Subscription: {0}".format(subscription))
 
     #download_bicep_modules()
-    run_input_loop()
+    a = run_input_loop()
+    
+   
+
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
     print("Your deployment will approximately take 78 seconds")
-    deploy_bicep(deploy_name)
+    deploy_bicep(deploy_name, name)
+
+    if int(a[0]) == 3:
+        #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
+        stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
+
+
 
     print ("Your depeployment seems complete here is the resource group link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription, deploy_name) + bcolors.ENDC)
