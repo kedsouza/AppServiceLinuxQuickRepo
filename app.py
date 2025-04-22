@@ -141,18 +141,5 @@ def main():
 
 main()    
 
-# Commented out for testing.
-
-# Refactor start at beginning of the program and make async.
-
-# deploy_name = subprocess.run(["az", "account", "show"], capture_output=True)
-# name = json.loads(deploy_name.stdout)['user']['name']
-# user_name = name.split('@')[0]
-# d_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 9))
-
-# #az group create --name $name --location eastus
-# subprocess.run(["az", "group", "create", "--name", d_name, "--location", "eastus"])
-# #az deployment group create --resource-group $name --template-file main.bicep
-# subprocess.run(["az", "deployment", "group", "create", "--resource-group", d_name, "--template-file", "main.bicep"])
 
 
