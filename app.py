@@ -2,7 +2,8 @@ import subprocess, sys, io, os, json, random, asyncio, time
 
 bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {}",
-    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
+    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
+    "appservicewebforcontinaerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}" 
 }
 
 appservice_types = { 
@@ -76,10 +77,8 @@ def run_input_loop():
     match appservice_type:
         case 1:
             write_bicep(["appserviceplan", "appserviceblessedimage"])
-            print("Not implemented Yet")
         case 2:
-            print ("Not implemented Yet")
-            exit()
+            write_bicep(["appserviceplan", "appservicewebforcontinaerpublic"])
         case 3:
             print ("Not implemented Yet")
             exit()
