@@ -1,4 +1,4 @@
-## AppServiceQuickRepo
+# AppServiceQuickRepo
 
 ### Open your Azure Shell, copy / paste the following code block in your shell to run. 
 ```
