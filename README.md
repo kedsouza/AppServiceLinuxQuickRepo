@@ -8,7 +8,7 @@ git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServ
 Video Demo.
 
 ## Project Goal
-####The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up Azure Environments.
+### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up Azure Environments.
 
 Creating interconnected Azure resources can be timeconsuming:
 - Creation from the Azure Portal can involve a lot of clicks.
