@@ -33,9 +33,10 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def stream_output(command):
+    subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
     filename = "stream.log"
     with io.open(filename, "w") as writer, io.open(filename, "r") as reader:
-        process = subprocess.Popen(command, shell= True, stdout=writer)
+        process = subprocess.Popen(command, shell=subprocess_use_shell, stdout=writer)
         while process.poll() is None:
             sys.stdout.write(reader.read())
         # Read the remaining
@@ -49,7 +50,8 @@ def write_bicep(modules_list):
     f.close()
 
 def get_az_account_data():
-    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True, shell=True)
+    subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
+    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True, shell=subprocess_use_shell)
     return json.loads(deploy_name.stdout)
 
 
