@@ -4,12 +4,7 @@
 ```
 git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py
 ```
-
-Video Demo.
-
-https://github.com/user-attachments/assets/3d27a466-47df-42d2-b4c2-37c430dfbae8
-
-
+![Video Project 2 (1)](https://github.com/user-attachments/assets/a46b623a-b8c2-4313-8e32-fd4273c4693f)
 
 ## Project Goal
 ### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up Azure Environments.
