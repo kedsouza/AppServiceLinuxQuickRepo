@@ -3,7 +3,7 @@ var location = resourceGroup().location
 param appServicePlanName string
 
 resource appservice 'Microsoft.Web/sites@2024-04-01' = {
-  name: uniqueString(resourceGroup().id)
+  name: appServicePlanName
   location: location
   properties : {
     serverFarmId: appServicePlanName
@@ -12,3 +12,6 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
     }
   }
 }
+
+@description('The name of the app service:')
+output appservicename string = appservice.name

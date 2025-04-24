@@ -12,3 +12,6 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
   }
   }
 }
+
+@description('The name of the app service:')
+output appservicename string = appservice.name
