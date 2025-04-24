@@ -143,9 +143,14 @@ def main():
     print(a)
    
 
+    # Need to rewrite ! 
     if a[1][1][1] == True:
         print ("Adding VNET")
         write_bicep(['vnet'])
+
+    if a[1][2][1] == True:
+        print("Adding private endpoint")
+        
 
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
