@@ -7,7 +7,8 @@ bicep_code = {
     "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
-    "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
+    "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname, vnetname: vnet.outputs.vnetname }}"
 }
 
 appservice_types = { 
@@ -150,7 +151,8 @@ def main():
 
     if a[1][2][1] == True:
         print("Adding private endpoint")
-        
+        write_bicep(['vnet', 'privateendpoint' ])
+       
 
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
