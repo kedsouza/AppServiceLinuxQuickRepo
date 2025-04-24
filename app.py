@@ -9,7 +9,8 @@ bicep_code = {
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {name: uid }}"
 }
 
 appservice_types = { 
@@ -156,6 +157,10 @@ def main():
     if a[1][4][1] == True:
         print("Adding file mount")
         write_bicep(['filestorage'])
+
+    if a[1][6][1] == True:
+        print("Adding file kevault")
+        write_bicep(['keyvault'])
         
 
 
