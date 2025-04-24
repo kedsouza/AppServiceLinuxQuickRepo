@@ -6,7 +6,8 @@ bicep_code = {
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
-    "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}"
+    "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
+    "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
 }
 
 appservice_types = { 
@@ -139,8 +140,12 @@ def main():
 
     #download_bicep_modules()
     a = run_input_loop()
-    
+    print(a)
    
+
+    if a[1][1][1] == True:
+        print ("Adding VNET")
+        write_bicep(['vnet'])
 
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
@@ -151,7 +156,7 @@ def main():
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
 
-
+    
 
     print ("Your depeployment seems complete here is the resource group link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription, deploy_name) + bcolors.ENDC)
