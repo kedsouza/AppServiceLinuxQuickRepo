@@ -9,7 +9,7 @@ bicep_code = {
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
 }
 
 appservice_types = { 
@@ -152,6 +152,10 @@ def main():
     if a[1][3][1] == True:
         print ("Adding storing mount")
         write_bicep(['blobstorage'])
+
+    if a[1][4][1] == True:
+        print("Adding file mount")
+        write_bicep(['filestorage'])
         
 
 
