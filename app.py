@@ -9,7 +9,8 @@ bicep_code = {
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
 }
 
 appservice_types = { 
@@ -57,8 +58,13 @@ def write_bicep(modules_list):
 
 def get_az_account_data():
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
-    deploy_name = subprocess.run(["az", "account", "show"], capture_output=True, shell=subprocess_use_shell)
-    return json.loads(deploy_name.stdout)
+    data = subprocess.run(["az", "account", "show"], capture_output=True, shell=subprocess_use_shell)
+    account_data = json.loads(data.stdout)
+    subscription_id = account_data['id']
+    subscription_name = account_data['name']
+    user_name = account_data['user']['name'].split('@')[0]
+
+    return [user_name, subscription_name, subscription_id]
 
 
 def download_bicep_modules():
@@ -135,10 +141,14 @@ def deploy_bicep(deployment_name, name):
 def main():
     name = str(uuid.uuid4())[0:6]
     
-    account_data = get_az_account_data()
-    subscription, user_name = account_data['id'], account_data['user']['name'].split('@')[0]
+    user_name, subscription_name, subscription_id = get_az_account_data()
+    print("\nThis is the account information you are running with. If this is not correct please use `az account set` to correct this before continuing.")
+    print("--------------------------------------------------------------------------------")
     print("User: {0}".format(user_name))
-    print("Subscription: {0}".format(subscription))
+    print("Subscription Name: {0}".format(subscription_name))
+    print("Subscription Id: {0}".format(subscription_id))
+    print("--------------------------------------------------------------------------------\n")
+
 
     #download_bicep_modules()
     a = run_input_loop()
@@ -158,6 +168,10 @@ def main():
         write_bicep(['filestorage'])
         
 
+
+    if a[1][5][1] == True:
+        print("Adding app gateway")
+        write_bicep(['appgateway'])
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
     print("Your deployment will approximately take 78 seconds")
