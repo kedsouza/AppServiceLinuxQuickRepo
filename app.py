@@ -66,13 +66,6 @@ def get_az_account_data():
 
     return [user_name, subscription_name, subscription_id]
 
-
-def download_bicep_modules():
-    # Download and extract the necessary modules to run the script
-    subprocess.run(["wget", "-q", "https://github.com/kedsouza/AppServiceLinuxQuickRepo/raw/refs/heads/main/modules.zip"])
-    subprocess.run(["unzip", "-qo", "modules.zip"])
-    subprocess.run(["rm","modules.zip"])
-
 def run_input_loop():
     appservice_type = ''
     while appservice_type == '':
@@ -149,8 +142,6 @@ def main():
     print("Subscription Id: {0}".format(subscription_id))
     print("--------------------------------------------------------------------------------\n")
 
-
-    #download_bicep_modules()
     a = run_input_loop()
     print(a)
    
