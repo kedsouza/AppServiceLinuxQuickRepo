@@ -13,21 +13,6 @@ bicep_code = {
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
 }
 
-appservice_types = { 
-    1 : "Blessed Image: ",
-    2 : "Web App for Container Public Image: ",
-    3 : "Web App for Container Azure Container Registry Private Image: "
-}
-
-hash_additional_services = {
-    1 : ["Vnet Intergration        ", False],
-    2 : ["Private Endpoint         ", False],
-    3 : ["Storage Mount Blob       ", False],
-    4:  ["Storage Mount File Share ", False],
-    5 : ["App GateWay              ", False],
-    6 : ["KeyVault                 ", False]
-}
-
 services_pretty = {
  "appserviceblessedimage" : "Blessed Image: ",
  "appservicewebforcontainerpublic" : "Web App for Container Public Image: ",
@@ -40,27 +25,6 @@ services_pretty = {
  "privateendpoint" : "Private Endpoint         ",
  "keyvault" :  "KeyVault                 "
 }
-#     "Blessed Image: ",
-#     "Web App for Container Public Image: ", 
-#     "Web App for Container Azure Container Registry Private Image: ",
-#     "Vnet Intergration        ",
-#     "Private Endpoint         ",
-#     "Storage Mount Blob       ",
-#     "Storage Mount File Share ",
-#     "App GateWay              ",
-#     "KeyVault                 ",
-# ]
-
-services = {
- "acr"
- "vnet",
- "privateendpoint",
- "blobstorage",
- "filestorage",
- "appgateway",
- "privateendpoint"
-}
-
 
 class bcolors:
     HEADER = '\033[95m'
