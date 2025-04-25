@@ -9,7 +9,8 @@ bicep_code = {
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}"
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
 }
 
 appservice_types = { 
@@ -158,6 +159,10 @@ def main():
         write_bicep(['filestorage'])
         
 
+
+    if a[1][5][1] == True:
+        print("Adding app gateway")
+        write_bicep(['appgateway'])
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
     print("Your deployment will approximately take 78 seconds")
