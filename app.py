@@ -16,7 +16,7 @@ bicep_code = {
 appservice_types = { 
     1 : "Blessed Image: ",
     2 : "Web App for Container Public Image: ",
-    3: "Web App for Container Azure Container Registry Private Image: "
+    3 : "Web App for Container Azure Container Registry Private Image: "
 }
 
 hash_additional_services = {
@@ -27,6 +27,40 @@ hash_additional_services = {
     5 : ["App GateWay              ", False],
     6 : ["KeyVault                 ", False]
 }
+
+services_pretty = {
+ "appserviceblessedimage" : "Blessed Image: ",
+ "appservicewebforcontainerpublic" : "Web App for Container Public Image: ",
+ "appservicewebforcontainerprivate" : "Web App for Container Azure Container Registry Private Image: ",
+ "vnet" : "Vnet Intergration        ",
+ "privateendpoint" : "Private Endpoint         ",
+ "blobstorage" : "Storage Mount Blob       ",
+ "filestorage": "Storage Mount File Share ",
+ "appgateway": "App GateWay              ",
+ "privateendpoint" : "Private Endpoint         ",
+ "keyvault" :  "KeyVault                 "
+}
+#     "Blessed Image: ",
+#     "Web App for Container Public Image: ", 
+#     "Web App for Container Azure Container Registry Private Image: ",
+#     "Vnet Intergration        ",
+#     "Private Endpoint         ",
+#     "Storage Mount Blob       ",
+#     "Storage Mount File Share ",
+#     "App GateWay              ",
+#     "KeyVault                 ",
+# ]
+
+services = {
+ "acr"
+ "vnet",
+ "privateendpoint",
+ "blobstorage",
+ "filestorage",
+ "appgateway",
+ "privateendpoint"
+}
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -67,13 +101,15 @@ def get_az_account_data():
     return [user_name, subscription_name, subscription_id]
 
 def run_input_loop():
+    service_selection = set()
+
     appservice_type = ''
     while appservice_type == '':
         try: 
             print("Choose App Service Type:\n")
-            print(appservice_types[1] + bcolors.WARNING + "[1]" + bcolors.ENDC)
-            print(appservice_types[2] + bcolors.WARNING + "[2]" + bcolors.ENDC)
-            print(appservice_types[3] + bcolors.WARNING + "[3]" + bcolors.ENDC)
+            print(services_pretty['appserviceblessedimage'] + bcolors.WARNING + "[1]" + bcolors.ENDC)
+            print(services_pretty['appservicewebforcontainerpublic'] + bcolors.WARNING + "[2]" + bcolors.ENDC)
+            print(services_pretty['appservicewebforcontainerprivate'] + bcolors.WARNING + "[3]" + bcolors.ENDC)
             appservice_type = int(input("Enter 1,2, or 3: "))
             if int(appservice_type) not in ([1,2,3]):
                 appservice_type = ''
@@ -81,15 +117,15 @@ def run_input_loop():
         except ValueError:
             print('\n' + bcolors.FAIL + 'Incorrect value, enter: 1, 2, or 3' + bcolors.ENDC)
 
-    write_bicep(["param_name"])
-
     match appservice_type:
         case 1:
-            write_bicep(["appserviceplan", "appserviceblessedimage"])
+            service_selection.add('appserviceblessedimage')
         case 2:
-            write_bicep(["appserviceplan", "appservicewebforcontainerpublic"])
+            service_selection.add('appservicewebforcontainerpublic')
         case 3:
-            write_bicep(["appserviceplan", "acr", "appservicewebforcontainerprivate"])
+            service_selection.add('appservicewebforcontainerprivate')
+            service_selection.add('acr')
+    
 
     done = False
     while done == False:
@@ -98,26 +134,27 @@ def run_input_loop():
 
         print ('Service                     | Added')
         
-        for i in range (1,7):
-            service = hash_additional_services.get(i)
-            if service[1] == False:
-                print ("{0:18}| {1}".format(service[0] + bcolors.WARNING + "[" + str(i) + "]" + bcolors.ENDC, str(service[1])))
+        selection_list = ['vnet', 'privateendpoint', 'blobstorage', 'filestorage', 'appgateway', 'keyvault']
+
+        for i, s in enumerate(selection_list):
+            if s not in service_selection:
+                print ("{0:18}| {1}".format(services_pretty[s] + bcolors.WARNING + "[" + str(i + 1) + "]" + bcolors.ENDC, "False"))
             else:
-                print ("{0:18}| {1}".format(service[0] + bcolors.WARNING + "[" + str(i) + "]" + bcolors.ENDC, (bcolors.OKGREEN + str(service[1]) + bcolors.ENDC + " - Re-enter number to remove")))
-    
+                print ("{0:18}| {1}".format(services_pretty[s] + bcolors.WARNING + "[" + str(i + 1) + "]" + bcolors.ENDC, (bcolors.OKGREEN + "True" + bcolors.ENDC + " - Re-enter number to remove")))
+
         y = input()
         input_string = y.split(" ")
         for i in input_string:
             if i in ['1', '2', '3', '4', '5', '6']:
-                service = hash_additional_services.get(int(i))
-                if service[1] == False:
-                    hash_additional_services[int(i)] = [hash_additional_services[int(i)][0], True]
+                service  = selection_list[int(i) - 1]
+                if service not in service_selection:
+                    service_selection.add(service)
                 else:
-                    hash_additional_services[int(i)] = [hash_additional_services[int(i)][0], False]
+                    service_selection.remove(service)
             elif i == "Y":
                 done = True
 
-    return [appservice_type, hash_additional_services]
+    return service_selection
 
 def deploy_bicep(deployment_name, name):
     print(name)
@@ -146,29 +183,18 @@ def main():
     print(a)
    
 
-    if a[1][1][1] == True:
-        print ("Adding VNET")
-        write_bicep(['vnet'])
+    
+    # Add default options to the bicep file.
+    write_bicep(["param_name"])
+    write_bicep(["appserviceplan"])
 
-    if a[1][3][1] == True:
-        print ("Adding storing mount")
-        write_bicep(['blobstorage'])
-
-    if a[1][4][1] == True:
-        print("Adding file mount")
-        write_bicep(['filestorage'])
-        
-
-
-    if a[1][5][1] == True:
-        print("Adding app gateway")
-        write_bicep(['appgateway'])
+    for s in a:
+        write_bicep([s])
 
     deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
-    print("Your deployment will approximately take 78 seconds")
     deploy_bicep(deploy_name, name)
 
-    if int(a[0]) == 3:
+    if "arc" in service_selection:
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
 
