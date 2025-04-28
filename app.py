@@ -1,11 +1,5 @@
 import subprocess, sys, io, os, json, random, asyncio, time, uuid
 
-with open('foodnames.json', 'r') as file:
-    names_data = json.load(file)
-
-foodnames = names_data['foods']
-
-
 bicep_code = { 
     "param_name" : "param uid string",
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {name: uid }}",
@@ -44,6 +38,9 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def generate_random_name():
+    with open('foodnames.json', 'r') as file:
+        names_data = json.load(file)
+        foodnames = names_data['foods']
     food = foodnames[random.randint(0, len(foodnames)-1)]
     return food + str(random.randint(0,999))
 
@@ -151,38 +148,32 @@ def main():
     print("Subscription Name: {0}".format(subscription_name))
     print("Subscription Id: {0}".format(subscription_id))
     print("--------------------------------------------------------------------------------\n")
-
     
     name = generate_random_name()
 
-    
-
-    a = run_input_loop()
-    print(a)
+    services = run_input_loop()
+    print(services)
    
-
-    
     # Add default options to the bicep file.
     write_bicep(["param_name"])
     write_bicep(["appserviceplan"])
 
-    for s in a:
+    for s in services:
         write_bicep([s])
 
     deploy_name = user_name + '-' + name
     deploy_bicep(deploy_name, name)
 
-    if "acr" in a:
+    if "acr" in services:
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
-
-    
 
     print ("Your depeployment seems complete here is the resource group link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
 
 
-main()    
+if __name__ == "__main__":
+    main()
 
 
 
