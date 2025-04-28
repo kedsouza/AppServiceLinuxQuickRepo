@@ -138,38 +138,43 @@ def deploy_bicep(deployment_name, name):
     #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
 
-
-def main():
-    
-    user_name, subscription_name, subscription_id = get_az_account_data()
+def print_subscription_information(user_name, subscription_name, subscription_id):
     print("\nThis is the account information you are running with. If this is not correct please use `az account set` to correct this before continuing.")
     print("--------------------------------------------------------------------------------")
     print("User: {0}".format(user_name))
     print("Subscription Name: {0}".format(subscription_name))
     print("Subscription Id: {0}".format(subscription_id))
     print("--------------------------------------------------------------------------------\n")
-    
-    name = generate_random_name()
 
-    services = run_input_loop()
-    print(services)
-   
-    # Add default options to the bicep file.
-    write_bicep(["param_name"])
-    write_bicep(["appserviceplan"])
+def print_deployment_complete(subscription_id, deploy_name):
+    print ("Your depeployment seems complete here is the resource group link")
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
 
-    for s in services:
-        write_bicep([s])
-
-    deploy_name = user_name + '-' + name
-    deploy_bicep(deploy_name, name)
-
+def run_any_outstanding_az_cli_commands():
     if "acr" in services:
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
 
-    print ("Your depeployment seems complete here is the resource group link")
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
+
+def main():
+    
+    user_name, subscription_name, subscription_id = get_az_account_data()
+    print_subscription_information(user_name, subscription_name, subscription_id)
+    name = generate_random_name()
+    services = run_input_loop()
+
+    # Add default options to the bicep file.
+    write_bicep(["param_name"])
+    write_bicep(["appserviceplan"])
+    for service in services:
+        write_bicep([service])
+
+    deploy_name = user_name + '-' + name
+    deploy_bicep(deploy_name, name)
+
+    run_any_outstanding_az_cli_commands()
+
+    print_deployment_complete(subscription_id, deploy_name)
 
 
 if __name__ == "__main__":
