@@ -1,5 +1,11 @@
 import subprocess, sys, io, os, json, random, asyncio, time, uuid
 
+with open('foodnames.json', 'r') as file:
+    names_data = json.load(file)
+
+foodnames = names_data['foods']
+
+
 bicep_code = { 
     "param_name" : "param uid string",
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {name: uid }}",
@@ -36,6 +42,10 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+def generate_random_name():
+    food = foodnames[random.randint(0, len(foodnames)-1)]
+    return food + str(random.randint(0,999))
 
 def stream_output(command):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
@@ -133,7 +143,6 @@ def deploy_bicep(deployment_name, name):
 
 
 def main():
-    name = str(uuid.uuid4())[0:6]
     
     user_name, subscription_name, subscription_id = get_az_account_data()
     print("\nThis is the account information you are running with. If this is not correct please use `az account set` to correct this before continuing.")
@@ -142,6 +151,11 @@ def main():
     print("Subscription Name: {0}".format(subscription_name))
     print("Subscription Id: {0}".format(subscription_id))
     print("--------------------------------------------------------------------------------\n")
+
+    
+    name = generate_random_name()
+
+    
 
     a = run_input_loop()
     print(a)
@@ -155,10 +169,10 @@ def main():
     for s in a:
         write_bicep([s])
 
-    deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
+    deploy_name = user_name + '-' + name
     deploy_bicep(deploy_name, name)
 
-    if "arc" in service_selection:
+    if "acr" in a:
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
 
