@@ -1,11 +1,12 @@
-param name string
+param user string
+param id string
 param appservicename string
 
 var location = resourceGroup().location
 
 
 resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
-  name: name
+  name: '${user}-vnet-${id}'
   location: location
   properties: {
     addressSpace: {

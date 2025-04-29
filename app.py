@@ -8,7 +8,7 @@ bicep_code = {
     "appservicewacpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
-    "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "vnet":"module vnet 'modules/vnet.bicep' = {params: {id: id, user: user, appservicename: appservice.outputs.appservicename}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
@@ -46,13 +46,6 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
-def generate_random_name():
-    with open('foodnames.json', 'r') as file:
-        names_data = json.load(file)
-        foodnames = names_data['foods']
-    food = foodnames[random.randint(0, len(foodnames)-1)]
-    return food + str(random.randint(0,999))
 
 def generate_rg_name(user_name, services, id):
     print(services)
