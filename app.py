@@ -115,9 +115,6 @@ def run_input_loop():
 
         print("\nEnter space seperated numbers of the options, if done type: " + bcolors.OKGREEN + "[Y]" + bcolors.ENDC)
         print("Select additional services to add: \n")
-        print( bcolors.FAIL + "!" +  bcolors.ENDC +  'AppGateway is still in development.')
-
-
         print ('Service                     | Added')
         
         selection_list = ['acr', 'vnet', 'privateendpoint', 'blobstorage', 'filestorage', 'appgateway', 'keyvault']
