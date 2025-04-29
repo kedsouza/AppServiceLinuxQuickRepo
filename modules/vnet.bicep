@@ -35,6 +35,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
         properties: {
           addressPrefix: '10.0.3.0/27'}
       }
+      { 
+        name: 'appgatewaysubnet'
+        properties: {
+          addressPrefix: '10.0.4.0/27'}
+      }
     ]
   }
 }

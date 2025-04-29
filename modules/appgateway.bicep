@@ -4,9 +4,11 @@ var location = resourceGroup().location
 param id string
 param user string
 
-// resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
-//   name: name
-// }
+param vnetname string
+
+ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
+   name: vnetname
+ }
 
 resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   name: '${user}-ip-${id}'
@@ -27,16 +29,17 @@ resource appgateway 'Microsoft.Network/applicationGateways@2024-05-01' = {
   location: location
   properties: {
     sku: { 
-     name: 'Basic'
-     tier: 'Basic'
+     name: 'Standard_v2'
+     tier: 'Standard_v2'
      family: 'Generation_2'
+     capacity: 1
     }
     gatewayIPConfigurations: [
       {
         name: 'appGatewayIpConfig'
         properties: {
           subnet: {
-            id: resourceId('Microsoft.Network/virtualNetworks/subnets', 'c6d9c9' , 'appgateway')
+            id: vnet.properties.subnets[2].id
           }
         }
       }
@@ -63,17 +66,21 @@ resource appgateway 'Microsoft.Network/applicationGateways@2024-05-01' = {
     backendAddressPools: [
       {
         name: 'myBackendPool'
-        properties: {}
+        properties: {
+          backendAddresses: [
+            {fqdn: '${user}-appsvc-${id}.azurewebsites.net'}
+          ]
+        }
       }
     ]
     backendHttpSettingsCollection: [
       {
-        name: 'myHTTPSetting'
+        name: 'mybackendHTTPSetting'
         properties: {
           port: 80
           protocol: 'Http'
           cookieBasedAffinity: 'Disabled'
-          pickHostNameFromBackendAddress: false
+          pickHostNameFromBackendAddress: true
           requestTimeout: 20
         }
       }
@@ -83,10 +90,10 @@ resource appgateway 'Microsoft.Network/applicationGateways@2024-05-01' = {
         name: 'myListener'
         properties: {
           frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', name, 'appGwPublicFrontendIp')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', '${user}-appgw-${id}', 'appGwPublicFrontendIp')
           }
           frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', name, 'port_80')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', '${user}-appgw-${id}', 'port_80')
           }
           protocol: 'Http'
           requireServerNameIndication: false
@@ -100,13 +107,13 @@ resource appgateway 'Microsoft.Network/applicationGateways@2024-05-01' = {
           ruleType: 'Basic'
           priority: 1
           httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', name, 'myListener')
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', '${user}-appgw-${id}', 'myListener')
           }
           backendAddressPool: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', name , 'myBackendPool')
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', '${user}-appgw-${id}' , 'myBackendPool')
           }
           backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', name, 'myHTTPSetting')
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection','${user}-appgw-${id}', 'mybackendHTTPSetting')
           }
         }
       }
