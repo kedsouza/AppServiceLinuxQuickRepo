@@ -11,7 +11,7 @@ bicep_code = {
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {id: id, user: user, appservicename: appservice.outputs.appservicename}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
-    "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
+    "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {id:id, user:user }}",
     "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {id:id, user:user, appservicename: appservice.outputs.appservicename, vnetname: vnet.outputs.vnetname }}"
 }

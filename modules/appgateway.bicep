@@ -1,13 +1,15 @@
 var location = resourceGroup().location
 
-param name string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
-  name: name
-}
+param id string
+param user string
+
+// resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
+//   name: name
+// }
 
 resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
-  name: name
+  name: '${user}-ip-${id}'
   location: location
   sku: {
     name: 'Standard'
@@ -21,7 +23,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
 
 resource appgateway 'Microsoft.Network/applicationGateways@2024-05-01' = {
   
-  name: name
+  name: '${user}-appgw-${id}'
   location: location
   properties: {
     sku: { 
