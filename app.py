@@ -108,6 +108,7 @@ def run_input_loop():
         case 2:
             service_selection.add('appservicewacpublic')
            
+    print( bcolors.FAIL + "!" +  bcolors.ENDC +  'ACR, Private Endpoint, AppGateway, KeyVault are still in development.')
 
     done = False
     while done == False:
