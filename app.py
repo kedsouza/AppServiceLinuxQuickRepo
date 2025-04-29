@@ -155,6 +155,18 @@ def run_any_outstanding_az_cli_commands():
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
 
+def initalize_main_bicep():
+    try:
+        with open('main.bicep', 'x') as file:
+            # Add default options to the bicep file.
+            write_bicep(["param_name"])
+            write_bicep(["appserviceplan"])
+    except FileExistsError:
+        with open('main.bicep', 'w') as file:
+            # Add default options to the bicep file.
+            write_bicep(["param_name"])
+            write_bicep(["appserviceplan"])     
+
 
 def main():
     
@@ -163,12 +175,12 @@ def main():
     name = generate_random_name()
     services = run_input_loop()
 
-    # Add default options to the bicep file.
-    write_bicep(["param_name"])
-    write_bicep(["appserviceplan"])
+    initalize_main_bicep()
+    
     for service in services:
         write_bicep([service])
 
+    return
     deploy_name = user_name + '-' + name
     deploy_bicep(deploy_name, name)
 
