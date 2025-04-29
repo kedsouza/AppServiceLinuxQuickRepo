@@ -1,9 +1,10 @@
 import subprocess, sys, io, os, json, random, asyncio, time, uuid
 
 bicep_code = { 
-    "param_name" : "param uid string",
-    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {name: uid }}",
-    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
+    "param_id" : "param id string",
+    "param_user" : "param user string",
+    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {id : id, user: user}}",
+    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
@@ -147,14 +148,12 @@ def run_input_loop():
 
     return service_selection
 
-def deploy_bicep(deployment_name, name):
-    print(name)
+def deploy_bicep(deployment_name, user, id):
     # az group create --name $name --location eastus
-    #subprocess.run(["az", "group", "create", "--name", deployment_name, "--location", "eastus"], shell=True)
     stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
     
-    #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters name="uid"
-    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("uid=" + name ) ])
+    #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
+    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ])
     #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
 
@@ -179,12 +178,14 @@ def initalize_main_bicep():
     try:
         with open('main.bicep', 'x') as file:
             # Add default options to the bicep file.
-            write_bicep(["param_name"])
+            write_bicep(["param_id"])
+            write_bicep(["param_user"])
             write_bicep(["appserviceplan"])
     except FileExistsError:
         with open('main.bicep', 'w') as file:
             # Add default options to the bicep file.
-            write_bicep(["param_name"])
+            write_bicep(["param_id"])
+            write_bicep(["param_user"])
             write_bicep(["appserviceplan"])     
 
 
@@ -193,7 +194,6 @@ def main():
     user_name, subscription_name, subscription_id = get_az_account_data()
     print_subscription_information(user_name, subscription_name, subscription_id)
     
-    #name = generate_random_name()
     services = run_input_loop()
 
     id = str(random.randint(0, 9)) + str(random.randint(0, 9))
@@ -202,10 +202,8 @@ def main():
     initalize_main_bicep()
     for service in services:
         write_bicep([service])
-
-    #resource_group_name = user_name + '-' + name
     
-    deploy_bicep(resource_group_name, id)
+    deploy_bicep(resource_group_name, user_name, id)
     run_any_outstanding_az_cli_commands(services)
     
     print_deployment_complete(subscription_id, resource_group_name)
