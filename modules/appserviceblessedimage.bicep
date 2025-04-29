@@ -13,6 +13,9 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
       linuxFxVersion: 'PHP|8.4'
     }
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
 
 @description('The name of the app service:')
