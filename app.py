@@ -5,8 +5,8 @@ bicep_code = {
     "param_user" : "param user string",
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {id : id, user: user}}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
+    "appservicewacpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
+    "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
@@ -16,8 +16,8 @@ bicep_code = {
 
 services_pretty = {
  "appserviceblessedimage" : "Blessed Image: ",
- "appservicewebforcontainerpublic" : "Web App for Container Public Image: ",
- "appservicewebforcontainerprivate" : "Web App for Container Azure Container Registry Private Image: ",
+ "appservicewacpublic" : "Web App for Container: ",
+ "acr" : "Azure Container Registry ",
  "vnet" : "Vnet Intergration        ",
  "privateendpoint" : "Private Endpoint         ",
  "blobstorage" : "Storage Mount Blob       ",
@@ -60,7 +60,7 @@ def generate_rg_name(user_name, services, id):
         return user_name + '-repo-' + id 
     name = user_name + "-"
     for service in services:
-        if (service not in ['appserviceblessedimage', 'appservicewebforcontainerpublic' ]):
+        if (service not in ['appserviceblessedimage', 'appservicewacpublic']):
             name += service_name_short[service]
             name += '-'
     return name + id
@@ -100,10 +100,9 @@ def run_input_loop():
         try: 
             print("Choose App Service Type:\n")
             print(services_pretty['appserviceblessedimage'] + bcolors.WARNING + "[1]" + bcolors.ENDC)
-            print(services_pretty['appservicewebforcontainerpublic'] + bcolors.WARNING + "[2]" + bcolors.ENDC)
-            print(services_pretty['appservicewebforcontainerprivate'] + bcolors.WARNING + "[3]" + bcolors.ENDC)
-            appservice_type = int(input("Enter 1,2, or 3: "))
-            if int(appservice_type) not in ([1,2,3]):
+            print(services_pretty['appservicewacpublic'] + bcolors.WARNING + "[2]" + bcolors.ENDC)
+            appservice_type = int(input("Enter 1 or 2: "))
+            if int(appservice_type) not in ([1,2]):
                 appservice_type = ''
                 print('\n' + bcolors.FAIL + 'Incorrect value, enter: 1, 2, or 3' + bcolors.ENDC)
         except ValueError:
@@ -113,11 +112,8 @@ def run_input_loop():
         case 1:
             service_selection.add('appserviceblessedimage')
         case 2:
-            service_selection.add('appservicewebforcontainerpublic')
-        case 3:
-            service_selection.add('appservicewebforcontainerprivate')
-            service_selection.add('acr')
-    
+            service_selection.add('appservicewacpublic')
+           
 
     done = False
     while done == False:
@@ -126,7 +122,7 @@ def run_input_loop():
 
         print ('Service                     | Added')
         
-        selection_list = ['vnet', 'privateendpoint', 'blobstorage', 'filestorage', 'appgateway', 'keyvault']
+        selection_list = ['acr', 'vnet', 'privateendpoint', 'blobstorage', 'filestorage', 'appgateway', 'keyvault']
 
         for i, s in enumerate(selection_list):
             if s not in service_selection:
