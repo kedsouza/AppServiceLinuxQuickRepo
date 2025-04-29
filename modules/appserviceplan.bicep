@@ -1,13 +1,14 @@
 var location = resourceGroup().location
 
-param name string
+param id string
+param user string
 
 resource appserviceplan 'Microsoft.Web/serverfarms@2024-04-01' = {
-  name: name
+  name: '${user}-asp-${id}'
   location: location
   kind: 'linux'
   sku: {
-    name: 'B3'
+    name: 'P0V3'
   }
   properties: {
     reserved: true

@@ -2,10 +2,11 @@ var location = resourceGroup().location
 
 param appservicename string
 
-param name string
+param id string
+param user string
 
 resource storage 'Microsoft.Storage/storageAccounts@2024-01-01' = {
-  name: name
+  name: '${user}storage${id}'
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -20,7 +21,7 @@ resource filestorage 'Microsoft.Storage/storageAccounts/fileServices@2024-01-01'
 
 
 resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2024-01-01' = {
-  name: name
+  name: 'testfileshare'
   parent: filestorage
 }
 
