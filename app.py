@@ -9,8 +9,8 @@ bicep_code = {
     "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {id: id, user: user, appservicename: appservice.outputs.appservicename}}",
-    "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
+    "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
 }
 
