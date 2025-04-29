@@ -12,7 +12,8 @@ bicep_code = {
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
-    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}"
+    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
+    "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {id:id, user:user, appservicename: appservice.outputs.appservicename, vnetname: vnet.outputs.vnetname }}"
 }
 
 services_pretty = {
@@ -183,7 +184,6 @@ def initalize_main_bicep():
 
 
 def main():
-    
     user_name, subscription_name, subscription_id = get_az_account_data()
     print_subscription_information(user_name, subscription_name, subscription_id)
     
@@ -196,7 +196,10 @@ def main():
     if "acr" in services:
         services.remove('appservicewacpublic')
         services.add('appservicewacprivate')
-        print (services)
+    if "privateendpoint" in services and not "vnet" in services:
+        services.add('vnet')
+    
+    print (services)
     for service in services:
         write_bicep([service])
     

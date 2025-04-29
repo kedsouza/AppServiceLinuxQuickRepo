@@ -30,6 +30,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
           ]
         }
       }
+      { 
+        name: 'privateendpointsubnet'
+        properties: {
+          addressPrefix: '10.0.3.0/27'}
+      }
     ]
   }
 }
@@ -45,3 +50,6 @@ resource appservicevnetconfig 'Microsoft.Web/sites/networkConfig@2024-04-01' = {
     subnetResourceId: vnet.properties.subnets[0].id
   }
 }
+
+@description('The name of the vnet:')
+output vnetname string = vnet.name
