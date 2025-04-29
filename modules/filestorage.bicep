@@ -33,7 +33,7 @@ resource storagemount 'Microsoft.Web/sites/config@2024-04-01' = {
     name: 'azurestorageaccounts'
     parent: appservice
     properties: {
-       'blob ': {
+       'files ': {
         type :'AzureFiles'
         shareName: share.name
         mountPath: '/storagefile'
