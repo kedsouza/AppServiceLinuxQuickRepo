@@ -6,8 +6,8 @@ bicep_code = {
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {id : id, user: user}}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewacpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
-    "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
+    "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
+    "acr" :"module acr 'modules/acr.bicep' = {params: {id: id, user: user }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {id: id, user: user, appservicename: appservice.outputs.appservicename}}",
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
@@ -108,12 +108,14 @@ def run_input_loop():
         case 2:
             service_selection.add('appservicewacpublic')
            
-    print( bcolors.FAIL + "!" +  bcolors.ENDC +  'ACR, Private Endpoint, AppGateway, KeyVault are still in development.')
 
     done = False
     while done == False:
+
         print("\nEnter space seperated numbers of the options, if done type: " + bcolors.OKGREEN + "[Y]" + bcolors.ENDC)
         print("Select additional services to add: \n")
+        print( bcolors.FAIL + "!" +  bcolors.ENDC +  'Private Endpoint, AppGateway, KeyVault are still in development.')
+
 
         print ('Service                     | Added')
         
@@ -151,19 +153,19 @@ def deploy_bicep(deployment_name, user, id):
 def print_subscription_information(user_name, subscription_name, subscription_id):
     print("\nThis is the account information you are running with. If this is not correct please use `az account set` to correct this before continuing.")
     print("--------------------------------------------------------------------------------")
-    print("User: {0}".format(user_name))
-    print("Subscription Name: {0}".format(subscription_name))
-    print("Subscription Id: {0}".format(subscription_id))
+    print("User: " + bcolors.OKCYAN +  " {0}".format(user_name) + bcolors.ENDC)
+    print("Subscription Name: " + bcolors.OKCYAN + "{0}".format(subscription_name) + bcolors.ENDC) 
+    print("Subscription Id: " + bcolors.OKCYAN + "{0}".format(subscription_id) + bcolors.ENDC)
     print("--------------------------------------------------------------------------------\n")
 
 def print_deployment_complete(subscription_id, deploy_name):
-    print ("Your deployment seems complete here is the resource group link")
-    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
+    print ("Your deployment is running view progress by clicking on this link")
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/deployments".format(subscription_id, deploy_name) + bcolors.ENDC)
 
-def run_any_outstanding_az_cli_commands(services):
+def run_any_outstanding_az_cli_commands(services, user, id):
     if "acr" in services:
-        #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
-        stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
+        #az acr import --name kedsouzaacr03 --source mcr.microsoft.com/appsvc/php:latest_20221101.1 -t nginx:latest
+        stream_output(["az", "acr", "import", "--name", (user + 'acr' + id), "--source", "mcr.microsoft.com/appsvc/php:latest_20221101.1", "-t", "appsvcphp:latest"])
 
 def initalize_main_bicep():
     try:
@@ -191,14 +193,19 @@ def main():
     resource_group_name = generate_rg_name(user_name, services, id)
 
     initalize_main_bicep()
+    if "acr" in services:
+        services.remove('appservicewacpublic')
+        services.add('appservicewacprivate')
+        print (services)
     for service in services:
         write_bicep([service])
     
-    deploy_bicep(resource_group_name, user_name, id)
-    run_any_outstanding_az_cli_commands(services)
-    
     print_deployment_complete(subscription_id, resource_group_name)
 
+    deploy_bicep(resource_group_name, user_name, id)
+    run_any_outstanding_az_cli_commands(services, user_name, id)
+    
+    print("Done ! ")
 
 if __name__ == "__main__":
     main()
