@@ -12,6 +12,7 @@ bicep_code = {
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
+    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}"
 }
 
 services_pretty = {
@@ -126,7 +127,7 @@ def run_input_loop():
         y = input()
         input_string = y.split(" ")
         for i in input_string:
-            if i in ['1', '2', '3', '4', '5', '6']:
+            if i in ['1', '2', '3', '4', '5', '6', '7']:
                 service  = selection_list[int(i) - 1]
                 if service not in service_selection:
                     service_selection.add(service)

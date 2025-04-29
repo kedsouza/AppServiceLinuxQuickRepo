@@ -1,13 +1,13 @@
 var location = resourceGroup().location
 
-param name string
-
+param id string
+param user string
 param appservicename string
 
 
 
 resource kevyault 'Microsoft.KeyVault/vaults@2024-11-01' = {
-  name: 'k${name}'
+  name: '${user}-kv-${id}'
   location: location
   properties: {
     sku: {
