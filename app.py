@@ -157,7 +157,7 @@ def print_subscription_information(user_name, subscription_name, subscription_id
     print("--------------------------------------------------------------------------------\n")
 
 def print_deployment_complete(subscription_id, deploy_name):
-    print ("Your depeployment seems complete here is the resource group link")
+    print ("Your deployment seems complete here is the resource group link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
 
 def run_any_outstanding_az_cli_commands(services):
