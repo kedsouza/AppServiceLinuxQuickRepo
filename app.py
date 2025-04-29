@@ -22,8 +22,17 @@ services_pretty = {
  "blobstorage" : "Storage Mount Blob       ",
  "filestorage": "Storage Mount File Share ",
  "appgateway": "App GateWay              ",
- "privateendpoint" : "Private Endpoint         ",
  "keyvault" :  "KeyVault                 "
+}
+
+service_name_short = {
+ "acr"  : "acr",
+ "vnet" : "vnet",
+ "privateendpoint" : "pe",
+ "blobstorage" : "blobmnt",
+ "filestorage": "filemnt",
+ "appgateway": "appgw",
+ "keyvault" :  "kv"
 }
 
 class bcolors:
@@ -44,6 +53,17 @@ def generate_random_name():
     food = foodnames[random.randint(0, len(foodnames)-1)]
     return food + str(random.randint(0,999))
 
+def generate_rg_name(user_name, services, id):
+    print(services)
+    if len(services) < 2:
+        return user_name + '-repo-' + id 
+    name = user_name + "-"
+    for service in services:
+        if (service not in ['appserviceblessedimage', 'appservicewebforcontainerpublic' ]):
+            name += service_name_short[service]
+            name += '-'
+    return name + id
+    
 def stream_output(command):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
     filename = "stream.log"
@@ -150,7 +170,7 @@ def print_deployment_complete(subscription_id, deploy_name):
     print ("Your depeployment seems complete here is the resource group link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
 
-def run_any_outstanding_az_cli_commands():
+def run_any_outstanding_az_cli_commands(services):
     if "acr" in services:
         #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
@@ -172,21 +192,23 @@ def main():
     
     user_name, subscription_name, subscription_id = get_az_account_data()
     print_subscription_information(user_name, subscription_name, subscription_id)
-    name = generate_random_name()
+    
+    #name = generate_random_name()
     services = run_input_loop()
 
+    id = str(random.randint(0, 9)) + str(random.randint(0, 9))
+    resource_group_name = generate_rg_name(user_name, services, id)
+
     initalize_main_bicep()
-    
     for service in services:
         write_bicep([service])
 
-    return
-    deploy_name = user_name + '-' + name
-    deploy_bicep(deploy_name, name)
-
-    run_any_outstanding_az_cli_commands()
-
-    print_deployment_complete(subscription_id, deploy_name)
+    #resource_group_name = user_name + '-' + name
+    
+    deploy_bicep(resource_group_name, id)
+    run_any_outstanding_az_cli_commands(services)
+    
+    print_deployment_complete(subscription_id, resource_group_name)
 
 
 if __name__ == "__main__":
