@@ -1,4 +1,6 @@
-param name string
+param id string
+param user string
+
 param appservicename string
 param vnetname string
 
@@ -13,15 +15,9 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' existing = {
   name: appservicename
 }
 
-// resource privateendpointsubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-//     name: '${vnet.name}/privateendpointsubnet'
-//     properties: {
-//       addressPrefix: '10.0.3.0/27'
-//     }
-//   }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
-  name: name
+resource privateendpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: '${user}-pe-${id}'
   location: location
   
   properties: {
@@ -30,7 +26,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: name
+        name: 'appservicelink'
         properties: {
           privateLinkServiceId: appservice.id
           groupIds: [
@@ -43,14 +39,13 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
 }
 
 
-resource appserviceprivateendpoint 'Microsoft.Web/sites/privateEndpointConnections@2024-04-01' = {
-  parent: appservice
-  name: 'appserviceprivateendpointconnection'
-  properties: {
-    privateEndpoint: privateEndpoint
-    privateLinkServiceConnectionState: {
-      status: 'Approved'
-      
-    }
-  }
-}
+// resource appserviceprivateendpoint 'Microsoft.Web/sites/privateEndpointConnections@2024-04-01' = {
+//   parent: appservice
+//   name: 
+//   properties: {
+//     privateEndpoint: privateendpoint
+//     privateLinkServiceConnectionState: {
+//       status: 'Approved'
+//     }
+//   }
+// }

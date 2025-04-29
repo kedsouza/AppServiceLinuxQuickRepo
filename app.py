@@ -1,16 +1,6 @@
 import subprocess, sys, io, os, json, random, asyncio, time, uuid
 
 bicep_code = { 
-<<<<<<< HEAD
-    "param_name" : "param uid string",
-    "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {name: uid }}",
-    "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewebforcontainerpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
-    "appservicewebforcontainerprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
-    "acr" :"module acr 'modules/acr.bicep' = {params: {name: uid }}",
-    "vnet":"module vnet 'modules/vnet.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname}}",
-    "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {name: uid, appservicename: appserviceplan.outputs.appserviceplanname, vnetname: vnet.outputs.vnetname }}"
-=======
     "param_id" : "param id string",
     "param_user" : "param user string",
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {id : id, user: user}}",
@@ -22,8 +12,8 @@ bicep_code = {
     "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {name: uid }}",
-    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}"
->>>>>>> main
+    "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
+    "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {id:id, user:user, appservicename: appservice.outputs.appservicename, vnetname: vnet.outputs.vnetname }}"
 }
 
 services_pretty = {
@@ -194,41 +184,8 @@ def initalize_main_bicep():
 
 
 def main():
-    
-<<<<<<< HEAD
-    account_data = get_az_account_data()
-    subscription, user_name = account_data['id'], account_data['user']['name'].split('@')[0]
-    print("User: {0}".format(user_name))
-    print("Subscription: {0}".format(subscription))
-
-    #download_bicep_modules()
-    a = run_input_loop()
-    print(a)
-   
-
-    # Need to rewrite ! 
-    if a[1][1][1] == True:
-        print ("Adding VNET")
-        write_bicep(['vnet'])
-
-    if a[1][2][1] == True:
-        print("Adding private endpoint")
-        write_bicep(['vnet', 'privateendpoint' ])
-       
-
-
-    deploy_name = user_name + '-appserviceblessedimage-' + str(random.randint(0, 99))
-    print("Your deployment will approximately take 78 seconds")
-    deploy_bicep(deploy_name, name)
-
-    if int(a[0]) == 3:
-        #az acr import --name kedsouzabicepacr --source mcr.microsoft.com/dotnet/framework/samples:aspnetapp
-        stream_output(["az", "acr", "import", "--name", name , "--source", "docker.io/library/httpd:latest"])
-
-=======
     user_name, subscription_name, subscription_id = get_az_account_data()
     print_subscription_information(user_name, subscription_name, subscription_id)
->>>>>>> main
     
     services = run_input_loop()
 
@@ -239,7 +196,10 @@ def main():
     if "acr" in services:
         services.remove('appservicewacpublic')
         services.add('appservicewacprivate')
-        print (services)
+    if "privateendpoint" in services and not "vnet" in services:
+        services.add('vnet')
+    
+    print (services)
     for service in services:
         write_bicep([service])
     
