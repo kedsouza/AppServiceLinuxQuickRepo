@@ -1,9 +1,10 @@
 var location = resourceGroup().location
 
-param name string
+param id string
+param user string
 
 resource azurecontainerregistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
-  name: name
+  name: '${user}acr${id}'
   location: location
   sku: {
     name : 'Basic'

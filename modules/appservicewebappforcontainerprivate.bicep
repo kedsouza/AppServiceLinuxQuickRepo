@@ -1,17 +1,20 @@
 var location = resourceGroup().location
 
+
+param user string
+param id string
 param appServicePlanName string
 param azureContainerRegistryName string
 @secure()
 param azureContainerRegistryPassword string
 
 resource appservice 'Microsoft.Web/sites@2024-04-01' = {
-  name: appServicePlanName
+  name: '${user}-appsvc-${id}'
   location: location
   properties : {
     serverFarmId: appServicePlanName
     siteConfig: {
-      linuxFxVersion: 'DOCKER|${azureContainerRegistryName}.azurecr.io/library/httpd:latest'
+      linuxFxVersion: 'DOCKER|${azureContainerRegistryName}.azurecr.io/appsvcphp:latest'
       appSettings: [
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'

@@ -1,9 +1,11 @@
 var location = resourceGroup().location
 
+param user string
+param id string
 param appServicePlanName string
 
 resource appservice 'Microsoft.Web/sites@2024-04-01' = {
-  name: appServicePlanName
+  name: '${user}-appsvc-${id}'
   location: location
   properties : {
     serverFarmId: appServicePlanName
