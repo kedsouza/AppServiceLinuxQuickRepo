@@ -190,7 +190,7 @@ def main():
     resource_group_name = generate_rg_name(user_name, services, id)
 
     initalize_main_bicep()
-    if "acr" in services:
+    if "acr" in services and "appservicewacpublic" in services:
         services.remove('appservicewacpublic')
         services.add('appservicewacprivate')
     if "privateendpoint" in services and not "vnet" in services:
