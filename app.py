@@ -204,27 +204,31 @@ def review_service_selection(services):
     return services
 
 def main():
-    logging.basicConfig(filename='az_output.log', level=logging.INFO)
-    user_name, subscription_name, subscription_id = get_az_account_data()
-    print_subscription_information(user_name, subscription_name, subscription_id)
-    
-    services = run_input_loop()
 
-    id = str(random.randint(0, 9)) + str(random.randint(0, 9))
-    resource_group_name = generate_rg_name(user_name, services, id)
+    try:
+        logging.basicConfig(filename='az_output.log', level=logging.INFO)
+        user_name, subscription_name, subscription_id = get_az_account_data()
+        print_subscription_information(user_name, subscription_name, subscription_id)
+        
+        services = run_input_loop()
 
-    initalize_main_bicep()
-    services = review_service_selection(services)    
+        id = str(random.randint(0, 9)) + str(random.randint(0, 9))
+        resource_group_name = generate_rg_name(user_name, services, id)
 
-    for service in services:
-        write_bicep([service])
-    
-    print_deployment_progress(subscription_id, resource_group_name)
+        initalize_main_bicep()
+        services = review_service_selection(services)    
 
-    deploy_bicep(resource_group_name, user_name, id)
-    
-    run_any_outstanding_az_cli_commands(services, user_name, id)
-    print_deployment_complete(subscription_id, resource_group_name)
+        for service in services:
+            write_bicep([service])
+        
+        print_deployment_progress(subscription_id, resource_group_name)
+
+        deploy_bicep(resource_group_name, user_name, id)
+        
+        run_any_outstanding_az_cli_commands(services, user_name, id)
+        print_deployment_complete(subscription_id, resource_group_name)
+    except KeyboardInterrupt:
+        exit()
 
 if __name__ == "__main__":
     main()
