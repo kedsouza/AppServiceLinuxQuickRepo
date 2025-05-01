@@ -4,6 +4,8 @@ param user string
 param id string
 param appServicePlanName string
 
+var identity = false
+
 resource appservice 'Microsoft.Web/sites@2024-04-01' = {
   name: '${user}-appsvc-${id}'
   location: location
@@ -11,6 +13,7 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
     serverFarmId: appServicePlanName
     siteConfig: {
       linuxFxVersion: 'PHP|8.4'
+      alwaysOn: true
     }
   }
   identity: {

@@ -156,9 +156,17 @@ def print_subscription_information(user_name, subscription_name, subscription_id
     print("Subscription Id: " + bcolors.OKCYAN + "{0}".format(subscription_id) + bcolors.ENDC)
     print("--------------------------------------------------------------------------------\n")
 
-def print_deployment_complete(subscription_id, deploy_name):
+def print_deployment_progress(subscription_id, deploy_name):
     print ("Your deployment is running view progress by clicking on this link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/deployments".format(subscription_id, deploy_name) + bcolors.ENDC)
+    print("Waiting for all operations to finish...")
+
+
+def print_deployment_complete(subscription_id, deploy_name):
+    
+    print ("Your deployment seems complete, you can view the resource group by clicking on this link")
+    print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
+
 
 def run_any_outstanding_az_cli_commands(services, user, id):
     if "acr" in services:
@@ -179,6 +187,15 @@ def initalize_main_bicep():
             write_bicep(["param_user"])
             write_bicep(["appserviceplan"])     
 
+def review_service_selection(services):
+    if "acr" in services and "appservicewacpublic" in services:
+        services.remove('appservicewacpublic')
+        services.add('appservicewacprivate')
+    if "privateendpoint" in services and not "vnet" in services:
+        services.add('vnet')
+    if "appgateway" in services and not "vnet" in services:
+        services.add('vnet')
+    return services
 
 def main():
     user_name, subscription_name, subscription_id = get_az_account_data()
@@ -190,24 +207,16 @@ def main():
     resource_group_name = generate_rg_name(user_name, services, id)
 
     initalize_main_bicep()
-    if "acr" in services and "appservicewacpublic" in services:
-        services.remove('appservicewacpublic')
-        services.add('appservicewacprivate')
-    if "privateendpoint" in services and not "vnet" in services:
-        services.add('vnet')
-    if "appgateway" in services and not "vnet" in services:
-        services.add('vnet')
-    
-    print (services)
+    services = review_service_selection(services)    
+
     for service in services:
         write_bicep([service])
     
-    print_deployment_complete(subscription_id, resource_group_name)
+    print_deployment_progress(subscription_id, resource_group_name)
 
     deploy_bicep(resource_group_name, user_name, id)
     run_any_outstanding_az_cli_commands(services, user_name, id)
-    
-    print("Done ! ")
+    print_deployment_complete(subscription_id, resource_group_name)
 
 if __name__ == "__main__":
     main()
