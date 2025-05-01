@@ -1,4 +1,4 @@
-import subprocess, sys, io, os, json, random, asyncio, time, uuid
+import subprocess, sys, io, os, json, random, asyncio, time, uuid, logging
 
 bicep_code = { 
     "param_id" : "param id string",
@@ -50,7 +50,6 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def generate_rg_name(user_name, services, id):
-    print(services)
     if len(services) < 2:
         return user_name + '-repo-' + id 
     name = user_name + "-"
@@ -63,6 +62,7 @@ def generate_rg_name(user_name, services, id):
 def stream_output(command):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
     filename = "stream.log"
+    
     with io.open(filename, "w") as writer, io.open(filename, "r") as reader:
         process = subprocess.Popen(command, shell=subprocess_use_shell, stdout=writer)
         while process.poll() is None:
@@ -140,11 +140,17 @@ def run_input_loop():
     return service_selection
 
 def deploy_bicep(deployment_name, user, id):
+    subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
+
     # az group create --name $name --location eastus
-    stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
+    output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
+    logging.info(json.loads(output.stdout))
+    #stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
     
     #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
-    stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ])
+    output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
+    logging.info(json.loads(output.stdout))
+    #stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ])
     #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
 
 
@@ -157,14 +163,14 @@ def print_subscription_information(user_name, subscription_name, subscription_id
     print("--------------------------------------------------------------------------------\n")
 
 def print_deployment_progress(subscription_id, deploy_name):
-    print ("Your deployment is running view progress by clicking on this link")
+    print ("\nYour deployment is running view progress by clicking on this link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/deployments".format(subscription_id, deploy_name) + bcolors.ENDC)
     print("Waiting for all operations to finish...")
 
 
 def print_deployment_complete(subscription_id, deploy_name):
     
-    print ("Your deployment seems complete, you can view the resource group by clicking on this link")
+    print ("\nYour deployment seems complete, you can view the resource group by clicking on this link")
     print(bcolors.OKBLUE + "https://ms.portal.azure.com/#@fdpo.onmicrosoft.com/resource/subscriptions/{0}/resourceGroups/{1}/overview".format(subscription_id, deploy_name) + bcolors.ENDC)
 
 
@@ -198,6 +204,7 @@ def review_service_selection(services):
     return services
 
 def main():
+    logging.basicConfig(filename='az_output.log', level=logging.INFO)
     user_name, subscription_name, subscription_id = get_az_account_data()
     print_subscription_information(user_name, subscription_name, subscription_id)
     
@@ -215,6 +222,7 @@ def main():
     print_deployment_progress(subscription_id, resource_group_name)
 
     deploy_bicep(resource_group_name, user_name, id)
+    
     run_any_outstanding_az_cli_commands(services, user_name, id)
     print_deployment_complete(subscription_id, resource_group_name)
 
