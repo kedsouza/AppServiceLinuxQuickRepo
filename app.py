@@ -142,16 +142,21 @@ def run_input_loop():
 def deploy_bicep(deployment_name, user, id):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
 
-    # az group create --name $name --location eastus
+    # az group create --verbose --name $name --location eastus
     output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
-    logging.info(json.loads(output.stdout))
-    #stream_output(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"])
+    try:
+        logging.info(json.loads(output.stdout))
+    except Exception as e:
+        print(e)
+        print(output.stdout)
     
     #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
     output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
-    logging.info(json.loads(output.stdout))
-    #stream_output(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ])
-    #subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep"], capture_output=True, shell=True)
+    try:
+        logging.info(json.loads(output.stdout))
+    except Exception as e:
+        print(e)
+        print(output.stdout)
 
 
 def print_subscription_information(user_name, subscription_name, subscription_id):
