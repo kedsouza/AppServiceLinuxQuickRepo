@@ -1,4 +1,4 @@
-import subprocess, sys, io, os, json, random, asyncio, time, uuid, logging
+import subprocess, sys, io, os, json, random, asyncio, time, uuid, logging, http.client
 
 bicep_code = { 
     "param_id" : "param id string",
@@ -142,21 +142,38 @@ def run_input_loop():
 def deploy_bicep(deployment_name, user, id):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
 
-    # az group create --verbose --name $name --location eastus
-    output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
     try:
+        # az group create --verbose --name $name --location eastus
+        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
-        print(e)
-        print(output.stdout)
+
+
+        print(type(e), e)
+
+        print("Your Azure Deployment failed due to the following message:")
+        print(bcolors.FAIL + str(output.stderr) + bcolors.ENDC)
+
+        print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
+
+        write_exception( str(output.stderr))
+        exit()
     
     #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
     output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
     try:
+        #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
+        output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
-        print(e)
-        print(output.stdout)
+        print(type(e), e)
+
+        print("Your Azure Deployment failed due to the following message:")
+        print(bcolors.FAIL + str(output.stderr) + bcolors.ENDC)
+
+        print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
+        write_exception( str(output.stderr))
+        exit()
 
 
 def print_subscription_information(user_name, subscription_name, subscription_id):
@@ -207,6 +224,17 @@ def review_service_selection(services):
     if "appgateway" in services and not "vnet" in services:
         services.add('vnet')
     return services
+
+def write_exception(content):
+    connection = http.client.HTTPSConnection('kedsouza-logger.azurewebsites.net')
+    connection.request('PUT', '/exception', content)
+    response = connection.getresponse()
+    # Print the status code and response body
+    print(f"Status: {response.status}, Reason: {response.reason}")
+    data = response.read().decode("utf-8")
+    print(f"Data: {data}")
+
+    connection.close()
 
 def main():
 
