@@ -233,10 +233,10 @@ def write_exception(content):
     connection = http.client.HTTPSConnection('kedsouza-logger.azurewebsites.net')
     connection.request('PUT', '/exception', content)
     response = connection.getresponse()
-    # Print the status code and response body
-    print(f"Status: {response.status}, Reason: {response.reason}")
-    data = response.read().decode("utf-8")
-    print(f"Data: {data}")
+    # # Print the status code and response body
+    # print(f"Status: {response.status}, Reason: {response.reason}")
+    # data = response.read().decode("utf-8")
+    # print(f"Data: {data}")
 
     connection.close()
 
