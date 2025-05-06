@@ -125,6 +125,7 @@ def run_input_loop():
             else:
                 print ("{0:18}| {1}".format(services_pretty[s] + bcolors.WARNING + "[" + str(i + 1) + "]" + bcolors.ENDC, (bcolors.OKGREEN + "True" + bcolors.ENDC + " - Re-enter number to remove")))
 
+        
         y = input()
         input_string = y.split(" ")
         for i in input_string:
@@ -136,6 +137,9 @@ def run_input_loop():
                     service_selection.remove(service)
             elif i == "Y":
                 done = True
+            else:
+                print('\n' + bcolors.FAIL + 'Incorrect value, enter 1 - 7 or Y to finish' + bcolors.ENDC)
+        
 
     return service_selection
 
