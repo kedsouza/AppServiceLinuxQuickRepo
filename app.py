@@ -148,7 +148,7 @@ def deploy_bicep(deployment_name, user, id):
 
     try:
         # az group create --verbose --name $name --location eastus
-        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
+        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "canadacentral"], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
 
