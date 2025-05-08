@@ -3,14 +3,15 @@ import subprocess, sys, io, os, json, random, asyncio, time, uuid, logging, http
 bicep_code = { 
     "param_id" : "param id string",
     "param_user" : "param user string",
+    "param_bothstoragetypes" : "param bothstoragetypes int",
     "appserviceplan" : "module appserviceplan 'modules/appserviceplan.bicep' = {params: {id : id, user: user}}",
     "appserviceblessedimage" : "module appservice 'modules/appserviceblessedimage.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewacpublic" : "module appservice 'modules/appservicewebappforcontainerpublic.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname}}",
     "appservicewacprivate" : "module appservice 'modules/appservicewebappforcontainerprivate.bicep' = {params: {id:id, user:user, appServicePlanName: appserviceplan.outputs.appserviceplanname, azureContainerRegistryName: acr.outputs.acrname, azureContainerRegistryPassword: acr.outputs.password }}",
     "acr" :"module acr 'modules/acr.bicep' = {params: {id: id, user: user }}",
     "vnet":"module vnet 'modules/vnet.bicep' = {params: {id: id, user: user, appservicename: appservice.outputs.appservicename}}",
-    "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
-    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
+    "blobstorage" :"module blobstorage 'modules/blobstorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename, bothstoragetypes: bothstoragetypes}}",
+    "filestorage" :"module filestorage 'modules/filestorage.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename, bothstoragetypes: bothstoragetypes}}",
     "appgateway" :"module appgateway 'modules/appgateway.bicep' = {params: {id:id, user:user, vnetname: vnet.outputs.vnetname }}",
     "keyvault" : "module keyvault 'modules/keyvault.bicep' = {params: {id : id, user: user, appservicename: appservice.outputs.appservicename}}",
     "privateendpoint" : "module privateendpoint 'modules/privateendpoint.bicep' = {params: {id:id, user:user, appservicename: appservice.outputs.appservicename, vnetname: vnet.outputs.vnetname }}"
@@ -143,12 +144,12 @@ def run_input_loop():
 
     return service_selection
 
-def deploy_bicep(deployment_name, user, id):
+def deploy_bicep(deployment_name, user, id, bothstoragetypes):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
 
     try:
         # az group create --verbose --name $name --location eastus
-        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "eastus"], capture_output=True, shell=subprocess_use_shell)
+        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "canadacentral"], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
 
@@ -164,10 +165,10 @@ def deploy_bicep(deployment_name, user, id):
         exit()
     
     #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
-    output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
+    #output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
     try:
         #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
-        output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user) ], capture_output=True, shell=subprocess_use_shell)
+        output = subprocess.run(["az", "deployment", "group", "create", "--verbose", "--resource-group", deployment_name, "--template-file", "main.bicep", "--parameters", ("id=" + id), ("user=" + user), ("bothstoragetypes=" + str(bothstoragetypes)) ], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
         print(type(e), e)
@@ -211,12 +212,14 @@ def initalize_main_bicep():
             # Add default options to the bicep file.
             write_bicep(["param_id"])
             write_bicep(["param_user"])
+            write_bicep(["param_bothstoragetypes"])
             write_bicep(["appserviceplan"])
     except FileExistsError:
         with open('main.bicep', 'w') as file:
             # Add default options to the bicep file.
             write_bicep(["param_id"])
             write_bicep(["param_user"])
+            write_bicep(["param_bothstoragetypes"])
             write_bicep(["appserviceplan"])     
 
 def review_service_selection(services):
@@ -255,12 +258,17 @@ def main():
         initalize_main_bicep()
         services = review_service_selection(services)    
 
+        bothstoragetypes = 0
+        if "blobstorage" in services and  "filestorage" in services:
+            bothstoragetypes = 1
+           
+
         for service in services:
             write_bicep([service])
         
         print_deployment_progress(subscription_id, resource_group_name)
 
-        deploy_bicep(resource_group_name, user_name, id)
+        deploy_bicep(resource_group_name, user_name, id, bothstoragetypes)
         
         run_any_outstanding_az_cli_commands(services, user_name, id)
         print_deployment_complete(subscription_id, resource_group_name)
