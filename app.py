@@ -144,12 +144,12 @@ def run_input_loop():
 
     return service_selection
 
-def deploy_bicep(deployment_name, user, id, bothstoragetypes):
+def deploy_bicep(deployment_name, user, id, bothstoragetypes, location):
     subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
 
     try:
         # az group create --verbose --name $name --location eastus
-        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", "canadacentral"], capture_output=True, shell=subprocess_use_shell)
+        output = subprocess.run(["az", "group", "create", "--verbose", "--name", deployment_name, "--location", location], capture_output=True, shell=subprocess_use_shell)
         logging.info(json.loads(output.stdout))
     except Exception as e:
 
@@ -245,6 +245,15 @@ def write_exception(content):
 
 def main():
 
+    
+
+    location = 'northcentralus'
+    
+    for arg in sys.argv:
+        if arg[0:8] == 'location':
+            location = arg[9:]
+            print("Setting location to:", location)
+
     try:
         logging.basicConfig(filename='az_output.log', level=logging.INFO)
         user_name, subscription_name, subscription_id = get_az_account_data()
@@ -268,7 +277,7 @@ def main():
         
         print_deployment_progress(subscription_id, resource_group_name)
 
-        deploy_bicep(resource_group_name, user_name, id, bothstoragetypes)
+        deploy_bicep(resource_group_name, user_name, id, bothstoragetypes, location)
         
         run_any_outstanding_az_cli_commands(services, user_name, id)
         print_deployment_complete(subscription_id, resource_group_name)
