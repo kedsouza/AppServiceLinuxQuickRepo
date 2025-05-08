@@ -18,7 +18,7 @@ Running tool this in your Azure Cloud Shell is the quickest way as you should be
 `location=<azure-region> ` default is northcentralus
 example usage: `python app.py location=eastus`
 
-## Project Reasonin / Sample Use Cases.
+## Project Reasoning / Sample Use Cases.
 
 Creating interconnected Azure resources can be time consuming:
 - Creation from the Azure Portal can involve a lot of clicks.
