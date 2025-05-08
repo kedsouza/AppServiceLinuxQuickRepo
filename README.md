@@ -12,12 +12,22 @@ git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServ
 ```
 ![Video Project 2 (1)](https://github.com/user-attachments/assets/a46b623a-b8c2-4313-8e32-fd4273c4693f)
 
+Running tool this in your Azure Cloud Shell is the quickest / easiest way as you should be signed in by default and the shell has python installed by default.
+
 ## Optional Parameters
 `location=<azure-region> ` default is northcentralus
 example usage: `python app.py location=eastus`
 
-## Reasonings
+## Project Reasonin / Sample Use Cases.
 
 Creating interconnected Azure resources can be time consuming:
 - Creation from the Azure Portal can involve a lot of clicks.
-- Using the Azure CLI can involve a lot of workload in terms of making sure you are typing the correct parameters. 
+- Using the Azure CLI can involve a lot of workload in terms of making sure you are typing the correct parameters.
+
+##  Run on your local machine. 
+Prerequistes:
+- Install the latest version of the Azure CLI and login to your Azure account.
+- Have Python3 installed on your machine.
+
+Run the following command from the command line:
+`git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python DEBUG app.py`
