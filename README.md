@@ -6,7 +6,7 @@
 The resources you deploy will not match prefectly what you are trying to create, but they can be used as a **starting point**. 
 
 
-## Open your Azure Shell, copy / paste the following code block in your shell to run. 
+## Open your [https://learn.microsoft.com/en-us/azure/cloud-shell/overview](Azure Cloud Shell), copy / paste the following code block in your shell to run. 
 ```
 git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py
 ```
