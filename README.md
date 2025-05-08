@@ -12,6 +12,10 @@ git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServ
 ```
 ![Video Project 2 (1)](https://github.com/user-attachments/assets/a46b623a-b8c2-4313-8e32-fd4273c4693f)
 
+## Optional Parameters
+`location=<azure-region> ` default is northcentralus
+example usage: `python app.py location=eastus`
+
 ## Reasonings
 
 Creating interconnected Azure resources can be time consuming:
