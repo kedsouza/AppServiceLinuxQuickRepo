@@ -1,7 +1,7 @@
 # AppServiceQuickRepo
 
 ## Project Goal
-### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up App Services and connecting Azure Resource.
+### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up App Services and connecting Azure Resources.
 
 Quickly create an app service with your choice of connected Azure Resources with minimal inputs.
 The resources you deploy will not match prefectly what you are trying to create, but they can be used as a **starting point**. 
