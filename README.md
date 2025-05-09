@@ -10,7 +10,7 @@ The resources you deploy will not match prefectly what you are trying to create,
 ```
 git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py
 ```
-![Video Project 4 (1)](https://github.com/user-attachments/assets/5df32618-be79-4cf0-a35c-1453e65e1db4)
+https://github.com/user-attachments/assets/20756c09-2be3-4ff7-9d5a-b617166830d1
 
 Running tool this in your Azure Cloud Shell is the quickest way as you should be signed in by default and the shell has python installed by default.
 
