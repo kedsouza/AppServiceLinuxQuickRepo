@@ -6,7 +6,7 @@
 Quickly create an app service with your choice of connected Azure Resources with minimal inputs.
 The resources you deploy will not match prefectly what you are trying to create, but they can be used as a **starting point**. 
 
-### Current Options:
+### Current Add-ons:
 - Azure Container Registry 
 - Vnet Intergration       
 - Private Endpoint        
