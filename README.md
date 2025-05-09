@@ -1,10 +1,23 @@
 # AppServiceQuickRepo
 
 ## Project Goal
-### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up Azure Environments.
+### The goal of the project is to provide a __**quick**__ method for engineers to get started on setting up App Services and connecting Azure Resource.
 
 The resources you deploy will not match prefectly what you are trying to create, but they can be used as a **starting point**. 
 
+Quickly create an app service with your choice of connected Azure Resources in a few button inputs.
+
+## Current Options
+App service blessed image or web app for container.
+
+Azure Service                   
+- Azure Container Registry 
+- Vnet Intergration       
+- Private Endpoint        
+- Storage Mount Blob      
+- Storage Mount File Share 
+- App GateWay              
+- KeyVault                 
 
 ## Open your [Azure Cloud Shell](https://learn.microsoft.com/en-us/azure/cloud-shell/overview), copy / paste the following code block in your shell to run. 
 ```
