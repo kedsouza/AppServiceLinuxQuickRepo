@@ -15,7 +15,7 @@ The resources you deploy will not match prefectly what you are trying to create,
 - App GateWay              
 - KeyVault                 
 
-## Open your [Azure Cloud Shell](https://learn.microsoft.com/en-us/azure/cloud-shell/overview), copy / paste the following code block in your shell to run. 
+## Open your [Azure Cloud Shell](https://learn.microsoft.com/en-us/azure/cloud-shell/overview), copy / paste the below code block in your shell to run. 
 ```
 git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py
 ```
