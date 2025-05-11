@@ -59,17 +59,6 @@ def generate_rg_name(user_name, services, id):
             name += service_name_short[service]
             name += '-'
     return name + id
-    
-def stream_output(command):
-    subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
-    filename = "stream.log"
-    
-    with io.open(filename, "w") as writer, io.open(filename, "r") as reader:
-        process = subprocess.Popen(command, shell=subprocess_use_shell, stdout=writer)
-        while process.poll() is None:
-            sys.stdout.write(reader.read())
-        # Read the remaining
-        sys.stdout.write(reader.read())
 
 def write_bicep(modules_list):
     f = open ('main.bicep', 'a')
@@ -203,8 +192,18 @@ def print_deployment_complete(subscription_id, deploy_name):
 
 def run_any_outstanding_az_cli_commands(services, user, id):
     if "acr" in services:
-        #az acr import --name kedsouzaacr03 --source mcr.microsoft.com/appsvc/php:latest_20221101.1 -t nginx:latest
-        stream_output(["az", "acr", "import", "--name", (user + 'acr' + id), "--source", "mcr.microsoft.com/appsvc/php:latest_20221101.1", "-t", "appsvcphp:latest"])
+        subprocess_use_shell = True if len(sys.argv) > 1  and sys.argv[1] == 'DEBUG' else False
+        try:
+            #az acr import --name kedsouzaacr03 --source mcr.microsoft.com/appsvc/php:latest_20221101.1 -t appsvcphp:latest
+            output = subprocess.run(["az", "acr", "import", "--name", (user + 'acr' + id), "--source", "mcr.microsoft.com/appsvc/php:latest_20221101.1", "-t", "appsvcphp:latest"], capture_output=True, shell=subprocess_use_shell)
+        except Exception as e:
+            print(type(e), e)
+            print("Your Azure Deployment failed due to the following message:")
+            print(bcolors.FAIL + str(output.stderr) + bcolors.ENDC)
+
+            print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
+            write_exception( str(output.stderr))
+            exit()
 
 def initalize_main_bicep():
     try:
