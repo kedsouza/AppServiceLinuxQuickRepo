@@ -136,7 +136,7 @@ def run_input_loop():
                     service_selection.add(service)
                 else:
                     service_selection.remove(service)
-            elif i == "Y":
+            elif i.upper() == "Y":
                 done = True
             else:
                 print('\n' + bcolors.FAIL + 'Incorrect value, enter 1 - 7 or Y to finish' + bcolors.ENDC)
