@@ -39,4 +39,4 @@ Prerequistes:
 - Have Python3 installed on your machine.
 
 Run the following command from the command line:
-`git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python DEBUG app.py`
+`git clone https://github.com/kedsouza/AppServiceLinuxQuickRepo.git && cd AppServiceLinuxQuickRepo && python app.py DEBUG`
