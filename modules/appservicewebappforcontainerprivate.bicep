@@ -13,6 +13,7 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
   location: location
   properties : {
     serverFarmId: appServicePlanName
+    
     siteConfig: {
       linuxFxVersion: 'DOCKER|${azureContainerRegistryName}.azurecr.io/appsvcphp:latest'
       appSettings: [
@@ -30,7 +31,11 @@ resource appservice 'Microsoft.Web/sites@2024-04-01' = {
         }
       ]
     }
+    
   
+  }
+  identity: {
+    type: 'SystemAssigned'
   }
 }
 
