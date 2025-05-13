@@ -150,7 +150,6 @@ def deploy_bicep(deployment_name, user, id, bothstoragetypes, location):
 
         print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
 
-        write_exception( str(output.stderr))
         exit()
     
     #az deployment group create --verbose --resource-group $name --template-file main.bicep --parameters id="32" user="kedsouza"
@@ -166,7 +165,6 @@ def deploy_bicep(deployment_name, user, id, bothstoragetypes, location):
         print(bcolors.FAIL + str(output.stderr) + bcolors.ENDC)
 
         print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
-        write_exception( str(output.stderr))
         exit()
 
 
@@ -202,7 +200,6 @@ def run_any_outstanding_az_cli_commands(services, user, id):
             print(bcolors.FAIL + str(output.stderr) + bcolors.ENDC)
 
             print("Feel free to file a Github Issues regarding this error, your feedback is appreciated.")
-            write_exception( str(output.stderr))
             exit()
 
 def initalize_main_bicep():
@@ -230,17 +227,6 @@ def review_service_selection(services):
     if "appgateway" in services and not "vnet" in services:
         services.add('vnet')
     return services
-
-def write_exception(content):
-    connection = http.client.HTTPSConnection('kedsouza-logger.azurewebsites.net')
-    connection.request('PUT', '/exception', content)
-    response = connection.getresponse()
-    # # Print the status code and response body
-    # print(f"Status: {response.status}, Reason: {response.reason}")
-    # data = response.read().decode("utf-8")
-    # print(f"Data: {data}")
-
-    connection.close()
 
 def main():
 
