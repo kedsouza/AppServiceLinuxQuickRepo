@@ -103,7 +103,9 @@ def run_input_loop():
     done = False
     while done == False:
 
-        print("\nEnter space seperated numbers of the options, if done type: " + bcolors.OKGREEN + "[Y]" + bcolors.ENDC)
+        print("\nEnter space seperated numbers of the options, if done type: " + bcolors.OKGREEN + "[y/Y]" + bcolors.ENDC)
+        print("Example Input: 1 2 6\n")
+
         print("Select additional services to add: \n")
         print ('Service                     | Added')
         
