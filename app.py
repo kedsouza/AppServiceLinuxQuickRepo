@@ -244,7 +244,7 @@ def main():
     try:
         logging.basicConfig(filename='az_output.log', level=logging.INFO)
         user_name, subscription_name, subscription_id = get_az_account_data()
-        user_name = user_name.split('.')[0]
+        user_name = user_name.split('.')[0].lower()
         print_subscription_information(user_name, subscription_name, subscription_id)
 
         
